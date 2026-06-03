@@ -1,40 +1,131 @@
-# Your Project Name
+# TAPR — Transition-Aware Process Reward for SLM Reasoning
 
-- **Problem Statement Number** - 
-- **Problem Statement Title** - *(Must exactly match one of the 11 Samsung EnnovateX AX Hackathon Problem Statements)*
-- **Team name** - *(Same as Phase 1 Team name)*
-- **Team members (Names)** - *Member 1 Name*, *Member 2 Name*
-- **Institute/College Name** - *Name*, *Campus Name & Address (In case the institute has multiple campuses)*
-- **Final Presentation Google Drive Link** - *Upload the PDF presentation for your final submission on Google Drive (It should be openly accessible and not behind any login wall)*
-- **Full Submission Demo Video Link** - *(Upload the Demo video on Youtube as a public or unlisted video and share the link. Google Drive uploads for video is not allowed.)*
-- **Setup & Result Reproducibility Video Link** - *(Upload the Demo video on Youtube as a public or unlisted video and share the link. Google Drive uploads for video is not allowed.)*
+* **Problem Statement Number** - 6
+* **Problem Statement Title** - Improving Reasoning in Small Language Models via Reinforcement Learning
+* **Team name** - Axiom
+* **Team members** - Harsh Raj, Swati Jayaram Kotary
+* **Institute/College Name** - Ramaiah Institute of Technology, MSR Nagar, MSRIT Post, Mathikere, Bengaluru – 560054, Karnataka
+* **Final Presentation Google Drive Link** - [ADD BEFORE SUBMISSION — must be publicly accessible, no login wall]
+* **Full Submission Demo Video Link** - [ADD BEFORE SUBMISSION — YouTube public/unlisted only]
+* **Setup & Result Reproducibility Video Link** - [ADD BEFORE SUBMISSION — YouTube public/unlisted only]
 
-### Project Artefacts
+---
 
-- **Technical Documentation** - Create a **docs** folder and add all technical details in markdown files inside this folder explaining the project Technical Stack, List of OSS libraries/projects used along with their links, the technical architecture of your solution, implementation details, installation instructions, user guide, salient features of the projects. Kindly add screenshots wherever possible.
-- **[Important]** Create a file `docs/ax.md` whiere you explain in detail how you utilizes open weight models and/or agentic development tools to implement your solution. Explain in detail your  Agentic AI setup , Agentic workflows, Reasoning & planning pipelines, Tool use / tool chaining, Coding assistants, agents, harness, MCP servers, agents.md, skills, Memory / context handling, Multi-agent orchestration systems, etc. Please highlight from your experience - what worked and **what did not work**.
-- **Source Code** - Create a **src** folder and add all developed project source codes (including training & benchmark evaluation codes) in the repo. The code must be capable of being successfully installed/executed and must run consistently on the intended platforms.
-- **Models Used** - *(Hugging Face links to all models used in the project. You are permitted to use only open weight models.)*
-- **Models Published** - *(In case you have developed a model as a part of your solution, kindly upload it on Hugging Face under appropriate open source license and add the link here.)*
-- **Datasets Used** - *(Links to all datasets used in the project. You are permitted to use publicly available datasets under licenses like Creative Commons, Open Data Commons, or equivalent.)*
-- **Datasets Published** - *(Links to all datasets created for the project and published on Hugging Face. You are allowed to publish any synthetic or proprietary dataset used in their project, but will be responsible for any legal compliance and permission for the same. The dataset can be published under Creative Commons, Open Data Commons, or equivalent license.)*
+## What is TAPR?
 
-#### Final Presentation
+Standard outcome-based RL rewards only the final answer, leaving the entire reasoning process unsupervised. For Small Language Models (SLMs, ≤7B parameters), this is damaging — they accumulate errors across steps, reach correct answers via flawed reasoning, and are highly sensitive to poorly designed reward signals.
 
-Unlike Phase 1 presentation, in Phase 2 you can freely decide the template, flow and content of your technical presentation. Ensure you cover all aspects of your solution - innovation, novelty, architecture, open datasets/models developed and used, final deliverable details, KPIs of your solution, AI/Agent use, any other details. 
+TAPR (Transition-Aware Process Reward) adds a process signal that rewards the *transition* from reasoning step N to step N+1 — the exact moment where reasoning either advances legitimately or breaks down.
 
-#### Full Submission Demo Video
+**Reward formula:**
+```
+R_final = R_outcome + λ · R_transition
+R_transition = mean(Qwen2.5-7B-Instruct judge scores across sliding windows)
+```
 
-Create a high quality video demonstration your solution in real life and showcasing how it is actually solves the proposed AX Hackathon problem.
+**Phase 1 validation results:**
+- TAPR signal: Spearman r = 0.600 (p < 0.0001) on 93 GSM8K problems
+- Ground truth beats flawed reasoning: 84/93 (90.3%)
+- Outcome reward alone: 0/93 separation of reasoning quality (blind by construction)
+- Progress signal tested and failed (r = −0.690, wrong direction) — documented honest negative result
 
-#### Setup & Result Reproducibility Video
+---
 
-To ensure reproducibility of results and to verify the presented KPIs, we require you to create a video demonstrating:
-- Step by step project installation,
-- Data/model download steps, 
-- Execution of all required codes to train the developed models (if any)
-- Execution of all evaluation codes to reproduce the presented results/KPIs 
+## Project Artefacts
 
-### Attribution 
+### Technical Documentation
 
-In case this project is built on top of an existing open source project, please provide the original project link here. Also, mention what new features were developed. Failing to attribute the source projects may lead to disqualification during the time of evaluation.
+Full documentation in [`docs/`](docs/):
+
+- [`docs/architecture.md`](docs/architecture.md) — System architecture, signal design, training pipeline
+- [`docs/installation.md`](docs/installation.md) — Installation and environment setup
+- [`docs/user_guide.md`](docs/user_guide.md) — Usage guide, training instructions, evaluation
+- [`docs/ax.md`](docs/ax.md) — Agentic AI usage, open weight model integration, what worked and what didn't
+
+### Source Code
+
+All code in [`src/`](src/):
+
+```
+src/
+├── validation/               # Phase 1 signal validation (completed)
+│   ├── tapr_generate_flaws.py
+│   ├── tapr_score_llm.py
+│   ├── tapr_score_progress.py
+│   └── tapr_signal_validation.py
+├── judge_precompute.py       # Qwen2.5-7B judge precomputation (Phase 2)
+├── sft_warmup.py             # Stage 1: light SFT warmup
+├── train_grpo.py             # Stage 2–4: GRPO training with TAPR reward
+└── eval.py                   # GSM8K / StrategyQA / MMLU evaluation
+```
+
+### Models Used
+
+| Model | Role | Link |
+|-------|------|------|
+| Qwen2.5-3B-Instruct | Base SLM — fine-tuned with GRPO + TAPR | [HuggingFace](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct) |
+| Qwen2.5-7B-Instruct | Transition judge — reward signal | [HuggingFace](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct) |
+
+### Models Published
+
+| Model | Description | Link |
+|-------|-------------|------|
+| TAPR-Qwen2.5-3B | Qwen2.5-3B fine-tuned with GRPO + TAPR reward, Apache 2.0 | [ADD AFTER TRAINING] |
+
+### Datasets Used
+
+| Dataset | Role | Link |
+|---------|------|------|
+| GSM8K | Primary benchmark — 8,500 grade school math problems | [HuggingFace](https://huggingface.co/datasets/openai/gsm8k) |
+| StrategyQA | Secondary benchmark — multi-step implicit reasoning | [HuggingFace](https://huggingface.co/datasets/wics/strategy-qa) |
+| MMLU | Tertiary benchmark — 57-subject reasoning | [HuggingFace](https://huggingface.co/datasets/cais/mmlu) |
+
+### Datasets Published
+
+| Dataset | Description | Link |
+|---------|-------------|------|
+| TAPR Validation Set | 100 GSM8K problems with paired flawed solutions across 3 empirically-grounded failure types (Type A: wrong quantity, Type B: semantic misread, Type C: collapsed reasoning). CC BY 4.0. | [ADD AFTER UPLOAD] |
+
+---
+
+## Technical Architecture
+
+### Signal Design
+
+The TAPR judge (Qwen2.5-7B-Instruct) evaluates windows of consecutive reasoning steps across five dimensions, each targeting an empirically documented SLM failure mode:
+
+| Dimension | Targets |
+|-----------|---------|
+| Local Validity — step N+1 follows logically from N | All failure types at transition level |
+| Value Consistency — quantities traceable to problem or prior steps | Type A: wrong quantity |
+| Question Coherence — reasoning addresses the actual question | Type B: semantic misread |
+| Convergence — steps collectively move toward a solution | Type D: directional drift |
+| Completeness — no unsupported final assertions | Type C: collapsed reasoning |
+
+Window size W sampled stochastically from {2, 3, 5} with P = (0.1, 0.5, 0.4), stride = 1. Judge precomputed **offline** before training — zero inference cost at training time.
+
+### Training Pipeline
+
+| Stage | Description |
+|-------|-------------|
+| 1 — Light SFT | 1 epoch, 200–300 examples, format compliance only |
+| 2 — Curriculum | Easy-to-hard ordering via zero-shot accuracy as difficulty proxy |
+| 3 — GRPO + TAPR | R_final = R_outcome + λ · R_transition |
+| 4 — Stability | KL penalty, entropy monitoring, prompt augmentation |
+
+**Base model:** Qwen2.5-3B-Instruct + LoRA (r=16, α=32, target: q_proj, v_proj)  
+**RL algorithm:** GRPO (no critic model needed)
+
+### Ablation Design
+
+| Run | Reward | Expected result |
+|-----|--------|-----------------|
+| Baseline | None (zero-shot) | 78% GSM8K |
+| Outcome-only | R_outcome | ~82–85% GSM8K |
+| TAPR | R_outcome + λ·R_transition | Target: >85% GSM8K |
+
+---
+
+## Attribution
+
+Built from scratch on open benchmarks (GSM8K, StrategyQA, MMLU) and open weight models (Qwen2.5 family, Apache 2.0). Training uses the [TRL library](https://github.com/huggingface/trl) for GRPO. No existing project forked or extended.
