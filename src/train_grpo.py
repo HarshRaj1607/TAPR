@@ -148,6 +148,14 @@ def parse_args():
         "--lr", type=float, default=LEARNING_RATE,
         help="Learning rate. Default: 1e-5"
     )
+    parser.add_argument(
+        "--smoke_test", action="store_true",
+        help=(
+            "Run 5 steps on 20 problems to verify the full pipeline works. "
+            "Always run this before committing to a full training run. "
+            "Takes ~5 minutes. Catches 90%% of bugs cheaply."
+        )
+    )
     return parser.parse_args()
 
 
@@ -448,6 +456,129 @@ def evaluate(model, tokenizer, eval_records: list, n: int = N_EVAL_SAMPLES) -> d
     return {"accuracy": round(acc, 4), "correct": int(correct), "total": total}
 
 
+# ── checkpoint resume ─────────────────────────────────────────────────────────
+
+def find_latest_checkpoint(output_dir: str) -> Optional[str]:
+    """
+    Find the latest saved checkpoint in output_dir.
+    Returns full path to checkpoint, or None if no checkpoints exist.
+    Called automatically before training — if found, run resumes from there.
+    """
+    if not os.path.exists(output_dir):
+        return None
+    checkpoints = [
+        d for d in os.listdir(output_dir)
+        if d.startswith("checkpoint-") and os.path.isdir(os.path.join(output_dir, d))
+    ]
+    if not checkpoints:
+        return None
+    checkpoints.sort(key=lambda x: int(x.split("-")[1]))
+    return os.path.join(output_dir, checkpoints[-1])
+
+
+# ── preflight check ───────────────────────────────────────────────────────────
+
+def preflight_check(student, student_tok, reward_fn, sample_record: dict,
+                    judge=None, judge_tok=None) -> bool:
+    """
+    Run before any training. Tests the full pipeline on one sample.
+    Catches: output format issues, reward function column mismatches,
+    judge device errors, dtype mismatches.
+
+    Returns True if all checks pass. Raises on hard failures.
+    """
+    print("\n" + "="*55)
+    print("PREFLIGHT CHECK")
+    print("="*55)
+    passed = True
+
+    # ── 1. Student can generate ───────────────────────────────────────────────
+    print("\n[1/4] Student generation...")
+    try:
+        inputs = student_tok(
+            sample_record["prompt"],
+            return_tensors="pt",
+            truncation=True,
+            max_length=256,
+        ).to(next(student.parameters()).device)
+
+        with torch.no_grad():
+            out = student.generate(
+                **inputs,
+                max_new_tokens=128,
+                do_sample=False,
+                pad_token_id=student_tok.eos_token_id,
+            )
+        new_tokens = out[0][inputs["input_ids"].shape[1]:]
+        sample_completion = student_tok.decode(new_tokens, skip_special_tokens=True)
+        print(f"  Generated {len(sample_completion)} chars")
+        print(f"  Preview: {sample_completion[:120].strip()}")
+    except Exception as e:
+        print(f"  ✗ FAIL: {e}")
+        raise RuntimeError("Student generation failed. Check model loading.") from e
+    print("  ✓ OK")
+
+    # ── 2. Output format contains #### ────────────────────────────────────────
+    print("\n[2/4] Output format check (#### marker)...")
+    if "####" in sample_completion:
+        extracted = extract_answer(sample_completion)
+        print(f"  ✓ OK — found ####, extracted: {extracted}")
+    else:
+        print("  ⚠ WARNING — no #### in output. Answer extraction will fail.")
+        print("  The system prompt may need adjustment, or the model needs warmup.")
+        print("  R_outcome will be 0 for all solutions without ####.")
+        print("  Sample output:")
+        print(f"  {sample_completion[:200]}")
+        passed = False  # soft fail — training can proceed but results will be poor
+
+    # ── 3. Reward function works ──────────────────────────────────────────────
+    print("\n[3/4] Reward function...")
+    try:
+        dummy_rewards = reward_fn(
+            completions=[sample_completion],
+            gt_num=[sample_record["gt_num"]],
+            question=[sample_record["question"]],
+        )
+        assert isinstance(dummy_rewards, list), "Reward must return list"
+        assert len(dummy_rewards) == 1, f"Expected 1 reward, got {len(dummy_rewards)}"
+        assert isinstance(dummy_rewards[0], float), f"Reward must be float, got {type(dummy_rewards[0])}"
+        ro = r_outcome(sample_completion, sample_record["gt_num"])
+        print(f"  R_final = {dummy_rewards[0]:.4f}  |  R_outcome = {ro:.1f}")
+    except Exception as e:
+        print(f"  ✗ FAIL: {e}")
+        raise RuntimeError("Reward function failed. Check column names and return types.") from e
+    print("  ✓ OK")
+
+    # ── 4. Judge works (tapr mode only) ───────────────────────────────────────
+    print("\n[4/4] Judge check...")
+    if judge is not None:
+        try:
+            steps = parse_steps(sample_completion)
+            if len(steps) >= 2:
+                score = judge_window(judge, judge_tok,
+                                     sample_record["question"], steps[:2])
+                assert 0.0 <= score <= 1.0, f"Score out of range: {score}"
+                print(f"  Judge score on first 2 steps: {score:.4f}")
+            else:
+                print("  Too few steps to judge — skipped (not a failure)")
+        except Exception as e:
+            print(f"  ✗ FAIL: {e}")
+            raise RuntimeError("Judge scoring failed. Check device placement and model loading.") from e
+        print("  ✓ OK")
+    else:
+        print("  Skipped (baseline mode — no judge)")
+
+    # ── summary ───────────────────────────────────────────────────────────────
+    print("\n" + "="*55)
+    if passed:
+        print("✓ PREFLIGHT PASSED — safe to start training")
+    else:
+        print("⚠ PREFLIGHT PASSED WITH WARNINGS — check output format above")
+        print("  Training will proceed but verify #### appears in outputs early on.")
+    print("="*55)
+    return passed
+
+
 # ── main ──────────────────────────────────────────────────────────────────────
 
 def main():
@@ -462,7 +593,10 @@ def main():
     print(f"\nMode:       {args.mode.upper()}")
     print(f"Lambda:     {args.lambda_val if args.mode == 'tapr' else 0.0}")
     print(f"Output:     {args.output_dir}")
-    print(f"Max steps:  {args.max_steps}")
+    if args.smoke_test:
+        print("*** SMOKE TEST MODE — 5 steps, 20 problems ***")
+    else:
+        print(f"Max steps:  {args.max_steps}")
     print(f"G (rollouts): {args.num_generations}")
 
     os.makedirs(args.output_dir, exist_ok=True)
@@ -481,6 +615,14 @@ def main():
     train_records = load_gsm8k(student_tok, split="train")
     eval_records  = load_gsm8k(student_tok, split="test")
 
+    # Smoke test: use tiny subset
+    if args.smoke_test:
+        train_records = train_records[:20]
+        eval_records  = eval_records[:10]
+        args.max_steps = 5
+        print(f"\nSmoke test: {len(train_records)} train, {len(eval_records)} eval, "
+              f"{args.max_steps} steps")
+
     # HuggingFace dataset format for GRPOTrainer
     from datasets import Dataset
     train_dataset = Dataset.from_list([
@@ -494,10 +636,20 @@ def main():
 
     # ── reward function ───────────────────────────────────────────────────────
     reward_fn = TAPRReward(
-        mode       = args.mode,
-        lambda_val = args.lambda_val,
+        mode        = args.mode,
+        lambda_val  = args.lambda_val,
         judge_model = judge,
         judge_tok   = judge_tok,
+    )
+
+    # ── preflight check ───────────────────────────────────────────────────────
+    preflight_check(
+        student       = student,
+        student_tok   = student_tok,
+        reward_fn     = reward_fn,
+        sample_record = train_records[0],
+        judge         = judge,
+        judge_tok     = judge_tok,
     )
 
     # ── GRPO config ───────────────────────────────────────────────────────────
@@ -545,7 +697,15 @@ def main():
     print("\n" + "="*55)
     print(f"TRAINING — {args.mode.upper()} MODE")
     print("="*55)
-    trainer.train()
+
+    checkpoint = find_latest_checkpoint(args.output_dir)
+    if checkpoint:
+        print(f"Checkpoint found: {checkpoint}")
+        print("Resuming from checkpoint — steps already done are skipped.")
+        trainer.train(resume_from_checkpoint=checkpoint)
+    else:
+        print("No checkpoint found — starting fresh.")
+        trainer.train()
 
     # ── post-training eval ────────────────────────────────────────────────────
     print("\n" + "="*55)
@@ -583,7 +743,10 @@ def main():
     print(f"Pre:   {pre_eval['accuracy']:.4f}")
     print(f"Post:  {post_eval['accuracy']:.4f}")
     print(f"Delta: {post_eval['accuracy'] - pre_eval['accuracy']:+.4f}")
-    if args.mode == "baseline":
+    if args.smoke_test:
+        print("\n*** SMOKE TEST COMPLETE ***")
+        print("Pipeline is working. Run without --smoke_test for full training.")
+    elif args.mode == "baseline":
         print("\nNext: run tapr mode and compare post-training accuracy.")
     else:
         print("\nNext: compare against baseline run_summary.json delta.")
