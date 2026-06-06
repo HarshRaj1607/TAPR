@@ -62,7 +62,7 @@ LORA_DROPOUT      = 0.05
 # ── training defaults ─────────────────────────────────────────────────────────
 LEARNING_RATE     = 1e-5
 KL_COEF           = 0.1
-NUM_GENERATIONS   = 8       # G: solutions per prompt in GRPO
+NUM_GENERATIONS   = 4       # G: solutions per prompt in GRPO
 BATCH_SIZE        = 2       # per device — keep small for T4
 GRAD_ACCUM        = 8       # effective batch = 16
 MAX_STEPS         = 1000    # covers most of GSM8K training split
