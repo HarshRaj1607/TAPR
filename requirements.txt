@@ -1,0 +1,44 @@
+# TAPR — Required packages
+#
+# Install on Colab/Kaggle:
+#   pip install -r requirements.txt
+#
+# If torch is already installed (Colab/Kaggle pre-installs it), skip it:
+#   pip install -r requirements.txt --no-deps torch
+#
+# These are the EXACT versions the reported runs used, read off the framework
+# versions recorded in each run's model card (runs/*/adapter/MODEL_CARD.md) and
+# the peft_version in each adapter_config.json. TRL's API moved substantially
+# between 0.x and 1.x, so an unpinned install will NOT reproduce these results.
+
+# Core training stack
+torch==2.11.0            # runs used 2.11.0+cu128 — match to your CUDA build
+transformers==4.56.2
+trl==1.5.1
+tokenizers==0.22.2
+peft==0.19.1
+bitsandbytes>=0.43.0,<0.48.0
+accelerate>=1.0.0,<2.0.0
+
+# Data
+datasets==5.0.0
+requests>=2.31.0         # StrategyQA is fetched over HTTP — see src/train_grpo.py
+
+# Analysis
+scipy>=1.11.0            # Spearman correlation in judge validation
+numpy>=1.24.0
+matplotlib>=3.7.0        # src/plot_training_curves.py
+
+# Optional — enable for logging during training
+# wandb
+
+# ── documented fallback ───────────────────────────────────────────────────────
+# The loose ranges the project originally shipped. They install cleanly, but the
+# TRL version you get will not be the one used for the reported results. Kept
+# only so the original environment spec isn't lost.
+#
+#   transformers>=4.45.0,<4.57.0
+#   trl>=0.16.0
+#   peft>=0.13.0
+#   datasets>=2.20.0
+#   accelerate>=0.26.0

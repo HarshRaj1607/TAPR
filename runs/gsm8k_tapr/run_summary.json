@@ -1,0 +1,31 @@
+{
+  "mode": "tapr",
+  "lambda_val": 0.3,
+  "lora": {
+    "r": 16,
+    "alpha": 32,
+    "targets": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj"
+    ]
+  },
+  "training": {
+    "max_steps": 400,
+    "lr": 1e-05,
+    "kl_coef": 0.1
+  },
+  "pre_training": {
+    "accuracy": 0.742,
+    "correct": 371,
+    "total": 500
+  },
+  "post_training": {
+    "accuracy": 0.804,
+    "correct": 402,
+    "total": 500
+  },
+  "delta": 0.062,
+  "_accuracy_provenance": "SUPERSEDED \u2014 do not cite. Written by an older version of train_grpo.py (no `task` field, no `unparseable`, N_EVAL_SAMPLES=500 vs the current 200). The 500-problem eval set behind these figures cannot be identified from the current code, and is not the first 500 of the GSM8K test split \u2014 eval.py scores the untrained model 0.7180 there, not the 0.742 recorded here. Config fields (mode, lambda_val, lora, training) are accurate. For GSM8K accuracy cite results/gsm8k/full_eval_summary.json (n=1319). See runs/README.md for the full diagnosis."
+}

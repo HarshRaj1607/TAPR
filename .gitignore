@@ -1,0 +1,56 @@
+# ── model weights ─────────────────────────────────────────────────────────────
+# The four trained LoRA adapters ARE committed — they are only 14 MB each and
+# they are the artifact behind every reported number. What is excluded:
+#
+#   runs/*/adapter/ref/     frozen reference adapters (28 MB each). Needed only
+#                           to resume training, not to load or evaluate a model.
+#   tokenizer files         identical across all four runs AND identical to
+#                           Qwen/Qwen2.5-3B-Instruct. Load the tokenizer from
+#                           the base model instead:
+#                             AutoTokenizer.from_pretrained("Qwen/Qwen2.5-3B-Instruct")
+#
+# This keeps the repository around 60 MB instead of 230 MB while leaving every
+# adapter directly loadable:
+#   PeftModel.from_pretrained(base, "runs/gsm8k_tapr/adapter")
+
+runs/*/adapter/ref/
+runs/*/adapter/tokenizer.json
+runs/*/adapter/tokenizer_config.json
+runs/*/adapter/vocab.json
+runs/*/adapter/merges.txt
+runs/*/adapter/added_tokens.json
+runs/*/adapter/special_tokens_map.json
+runs/*/adapter/chat_template.jinja
+
+# Training checkpoints — never committed, host large ones on HuggingFace
+checkpoints/
+*.bin
+*.pt
+*.ckpt
+
+# Kept outside the repo — never publish
+_archive/
+_private/
+machinery.html
+RESEARCH_MACHINERY.md
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Environment / secrets
+.env
+*.key
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Scratch
+/tmp/
+scratch/

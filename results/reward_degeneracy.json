@@ -1,0 +1,62 @@
+{
+  "metric": "frac_reward_zero_std",
+  "definition": "Fraction of training groups in which all G=4 sampled rollouts received identical rewards. When reward standard deviation within a group is zero, the GRPO advantage A_i = (R_i - mean(R)) / std(R) is zero for every rollout, so that group contributes no gradient. The model learns nothing from that problem.",
+  "why_it_matters": "This is the core mechanistic claim of TAPR. It is measured directly by the trainer, not inferred. Outcome-only GRPO is blind on a majority of its training data; TAPR restores signal on nearly all of it.",
+  "provenance": "exact — logged by GRPOTrainer every 10 steps, transcribed from Colab run logs",
+
+  "gsm8k": {
+    "baseline_orm": {
+      "typical": 0.525,
+      "note": "Stable throughout the 400-step run."
+    },
+    "tapr": {
+      "typical": 0.000,
+      "note": "Reaches ~0 within the first few steps and stays there."
+    },
+    "effective_training_data": {
+      "baseline_orm": "~47.5% of problems contribute gradient",
+      "tapr": "~100% of problems contribute gradient"
+    }
+  },
+
+  "strategyqa": {
+    "baseline_orm": {
+      "typical": 0.625,
+      "observed_range": [0.45, 0.85],
+      "logged_values_by_step": {
+        "10": 0.65, "20": 0.775, "30": 0.675, "40": 0.65, "50": 0.725,
+        "60": 0.85, "70": 0.70, "80": 0.75, "90": 0.70, "100": 0.45,
+        "110": 0.60, "120": 0.625, "130": 0.65, "140": 0.575, "150": 0.60,
+        "160": 0.70, "170": 0.70, "180": 0.60, "190": 0.625, "200": 0.775,
+        "210": 0.675, "220": 0.625, "230": 0.55, "240": 0.60, "250": 0.625,
+        "260": 0.60, "270": 0.625
+      }
+    },
+    "tapr": {
+      "typical": 0.003,
+      "observed_range": [0.0, 0.025],
+      "logged_values_by_step": {
+        "10": 0.025, "20": 0.0, "30": 0.0, "40": 0.0, "50": 0.0,
+        "60": 0.0, "70": 0.0, "80": 0.0, "90": 0.025, "100": 0.0,
+        "110": 0.0, "120": 0.0, "130": 0.025, "140": 0.0, "150": 0.0,
+        "160": 0.025, "170": 0.025, "180": 0.0, "190": 0.0, "200": 0.0
+      }
+    },
+    "note": "StrategyQA baseline degeneracy (~0.625) exceeds GSM8K baseline degeneracy (~0.525). Hypothesis: on a binary yes/no task, an uncertain model tends to emit the same answer across all four rollouts, collapsing reward variance more often than on numeric-answer tasks."
+  },
+
+  "smoke_test_confirmation": {
+    "task": "strategyqa",
+    "mode": "tapr",
+    "steps": 5,
+    "frac_reward_zero_std": 0.05,
+    "judge_score_sample": 0.74,
+    "note": "Judge returned a real score (0.74), not the 0.5 parse-failure fallback, confirming the scoring path was live and correct before the full run."
+  },
+
+  "interpretation": {
+    "claim": "TAPR eliminates reward degeneracy. This is causal and definitional, not correlational — if within-group reward variance is zero, the advantage is mathematically zero.",
+    "consistency": "The same pattern holds across two structurally different tasks (numeric-answer math and binary yes/no reasoning), suggesting the mechanism is task-agnostic.",
+    "connection_to_transfer": "The proposed link to the cross-task transfer result: ORM trains on ~47% of its data and over-fits to a narrow format; TAPR trains on ~100% and learns a broader policy. This link is a hypothesis, not yet established — the policy drift experiment is designed to test it."
+  }
+}

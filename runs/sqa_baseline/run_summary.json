@@ -1,0 +1,33 @@
+{
+  "task": "strategyqa",
+  "mode": "baseline",
+  "lambda_val": 0.0,
+  "lora": {
+    "r": 16,
+    "alpha": 32,
+    "targets": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj"
+    ]
+  },
+  "training": {
+    "max_steps": 400,
+    "lr": 1e-05,
+    "kl_coef": 0.1
+  },
+  "pre_training": {
+    "accuracy": 0.61,
+    "correct": 122,
+    "total": 200,
+    "unparseable": 0
+  },
+  "post_training": {
+    "accuracy": 0.625,
+    "correct": 125,
+    "total": 200,
+    "unparseable": 0
+  },
+  "delta": 0.015
+}

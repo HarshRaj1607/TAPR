@@ -1,0 +1,36 @@
+{
+  "benchmark": "MATH-500",
+  "dataset": "HuggingFaceH4/MATH-500",
+  "n_problems": 200,
+  "note": "200 of 500 problems evaluated (--limit 200). Answer matching: string normalization with LLM-judge fallback (Qwen2.5-7B) when normalization is inconclusive.",
+
+  "results": {
+    "zeroshot": {
+      "accuracy": 0.4700,
+      "correct": 94,
+      "total": 200,
+      "judge_calls": 189,
+      "provenance": "exact — transcribed from Colab run log",
+      "running_acc_checkpoints": {"50": 0.5400, "100": 0.5300, "150": 0.5000, "200": 0.4700}
+    },
+    "baseline_orm_gsm8k_trained": {
+      "accuracy": null,
+      "approx_accuracy": 0.47,
+      "provenance": "APPROXIMATE — observed during the run to be indistinguishable from zero-shot; exact final figure not captured before session ended. Must be re-run before publication.",
+      "total": 200
+    },
+    "tapr_gsm8k_trained": {
+      "accuracy": null,
+      "approx_accuracy": 0.47,
+      "provenance": "APPROXIMATE — observed during the run to be indistinguishable from zero-shot; exact final figure not captured before session ended. Must be re-run before publication.",
+      "total": 200
+    }
+  },
+
+  "interpretation": {
+    "headline": "Null result. All three models perform equivalently on MATH-500.",
+    "why": "GSM8K training does not transfer to competition math. MATH-500 requires algebraic techniques (complex factoring, trigonometric identities, number theory) absent from grade-school arithmetic training.",
+    "value_to_paper": "Establishes the outer boundary of the cross-task transfer effect. StrategyQA (yes/no reasoning) shows a 4.5pp TAPR advantage; MATH-500 shows none. The effect is not universal — it depends on structural similarity between train and eval distributions.",
+    "action_required": "Re-run baseline and TAPR MATH-500 evals to capture exact figures before any submission."
+  }
+}

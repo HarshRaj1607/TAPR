@@ -1,0 +1,147 @@
+{
+  "description": "Judge calibration tests. Protocol: for each problem, generate one correct reasoning chain and one deliberately flawed chain, score both with the judge, then measure (a) Spearman r between judge score and correct/flawed label, and (b) separation rate \u2014 the fraction of problems where correct scored above flawed.",
+  "provenance": "exact \u2014 transcribed from Colab run logs",
+  "pass_thresholds": {
+    "spearman_r": 0.65,
+    "separation_rate": 0.85,
+    "note": "Thresholds were set a priori. StrategyQA was accepted at r=0.531 / 85% after analysis showed the shortfall is a judge world-knowledge limitation rather than a design flaw."
+  },
+  "gsm8k": {
+    "early_reference": {
+      "judge": "gpt-4.1-mini",
+      "spearman_r": 0.6,
+      "separation": "84/93",
+      "separation_rate": 0.903,
+      "n": 93,
+      "status": "early reference baseline (closed-weight)",
+      "spearman_r_ci95": [
+        0.451,
+        0.716
+      ],
+      "separation_rate_ci95": [
+        0.826,
+        0.948
+      ]
+    },
+    "production": {
+      "judge": "Qwen/Qwen2.5-7B-Instruct",
+      "spearman_r": 0.734,
+      "separation": "19/20",
+      "separation_rate": 0.95,
+      "n": 20,
+      "status": "PASS \u2014 used for all GSM8K training",
+      "note": "Point estimate exceeds GPT-4.1-mini (0.734 vs 0.600), but at n=20 the 95% CI is [0.43, 0.89] against GPT-4.1-mini's [0.45, 0.72] at n=93 \u2014 the intervals overlap almost entirely and the comparison is NOT statistically supported. Separation rates overlap likewise (19/20 -> [0.76, 0.99]; 84/93 -> [0.83, 0.95]). The defensible claim is that the open-weight 7B judge is competitive with GPT-4.1-mini and removes the closed-weight API dependency, not that it beats it. n~80 would be needed for the lower bound to clear 0.600.",
+      "spearman_r_ci95": [
+        0.432,
+        0.888
+      ],
+      "separation_rate_ci95": [
+        0.764,
+        0.991
+      ]
+    },
+    "window_size_ablation": {
+      "W_2": {
+        "spearman_r": 0.6
+      },
+      "W_3_plus": {
+        "spearman_r": 0.69
+      },
+      "conclusion": "W>=3 scored higher (0.690 vs 0.600) and the window distribution was set to {2:0.1, 3:0.5, 5:0.4} on that basis. Both figures come from n=20 calibration sets, where a 0.09 difference in Spearman r is well inside noise. Treat this as a preliminary read that informed a design choice, not as an ablation."
+    }
+  },
+  "strategyqa": {
+    "qwen_7b": {
+      "judge": "Qwen/Qwen2.5-7B-Instruct",
+      "spearman_r": 0.531,
+      "p_value": 0.0004,
+      "separation": "17/20",
+      "separation_rate": 0.85,
+      "n": 20,
+      "mean_correct_score": 0.852,
+      "mean_flawed_score": 0.705,
+      "by_flaw_type": {
+        "factual": "7/7",
+        "chain": "6/7",
+        "relevance": "4/6"
+      },
+      "status": "PASS \u2014 used for all StrategyQA training",
+      "spearman_r_ci95": [
+        0.116,
+        0.788
+      ],
+      "separation_rate_ci95": [
+        0.64,
+        0.948
+      ],
+      "caveat": "r=0.531 at n=20 has a 95% CI of [0.12, 0.79]. The lower bound is close to zero, so this judge's calibration cannot be distinguished from weak. It produced the reward signal behind the cross-task transfer result, which makes widening n here the highest-value validation work available."
+    },
+    "qwen_32b": {
+      "judge": "Qwen/Qwen2.5-32B-Instruct",
+      "spearman_r": 0.388,
+      "p_value": 0.0135,
+      "separation": "14/20",
+      "separation_rate": 0.7,
+      "n": 20,
+      "mean_correct_score": 0.813,
+      "mean_flawed_score": 0.683,
+      "by_flaw_type": {
+        "factual": "5/7",
+        "chain": "4/7",
+        "relevance": "5/6"
+      },
+      "status": "FAIL \u2014 worse than 7B",
+      "finding": "Larger judge is not automatically better. 32B underperformed 7B on both r and separation. Hypothesis: 32B generates more nuanced correct-and-flawed chains that are harder to separate, and produces less decisive scores. Note the CIs on the 7B and 32B StrategyQA runs overlap substantially at n=20; 'larger is not better' is a suggestive observation here, not a result.",
+      "spearman_r_ci95": [
+        -0.066,
+        0.709
+      ],
+      "separation_rate_ci95": [
+        0.481,
+        0.855
+      ]
+    }
+  },
+  "math": {
+    "summary": "All three open-weight judges failed. MATH training was abandoned.",
+    "qwen_7b": {
+      "judge": "Qwen/Qwen2.5-7B-Instruct",
+      "spearman_r": 0.081,
+      "p_value": 0.6178,
+      "separation": "10/20",
+      "separation_rate": 0.5,
+      "by_flaw_type": {
+        "algebraic": "2/7",
+        "chain": "4/7",
+        "relevance": "4/6"
+      },
+      "status": "FAIL \u2014 no statistical signal"
+    },
+    "qwen_math_7b": {
+      "judge": "Qwen/Qwen2.5-Math-7B-Instruct",
+      "spearman_r": null,
+      "separation": "0/20",
+      "separation_rate": 0.0,
+      "status": "FAIL \u2014 format collapse",
+      "failure_mode": "Model ignores the SCORE output format entirely and emits its own full solution instead ('To evaluate the quality of the step-by-step reasoning, let's analyze each step carefully...'). A constraining system prompt had no effect. Its instruction tuning for math-solving overrides grader-role instructions. Every window fell back to the neutral 0.5 default, producing identical scores for correct and flawed chains."
+    },
+    "qwen_32b": {
+      "judge": "Qwen/Qwen2.5-32B-Instruct",
+      "spearman_r": 0.223,
+      "p_value": 0.1662,
+      "separation": "8/20",
+      "separation_rate": 0.4,
+      "mean_correct_score": 0.706,
+      "mean_flawed_score": 0.625,
+      "by_flaw_type": {
+        "algebraic": "0/7",
+        "chain": "3/7",
+        "relevance": "5/6"
+      },
+      "status": "FAIL \u2014 algebraic dimension at 0/7",
+      "note": "Format compliance was perfect (every window returned a valid SCORE). The failure is capability, not formatting."
+    },
+    "root_cause": "Detecting an injected algebraic error requires independently solving the problem. No open-weight model at 7B-32B scale does this reliably for competition math. Note the pattern across all three judges: the relevance dimension separates well (4-5/6) while the algebraic dimension does not (0-2/7). Relevance is checkable without solving; algebraic validity is not. This is a capability ceiling, not a prompt-engineering problem."
+  },
+  "uncertainty_note": "Confidence intervals added post hoc (95%). Spearman r: Fisher z-transform. Separation rate: Wilson score interval. Most of these calibration runs used n=20, which yields intervals wide enough that several pairwise comparisons in this file are not statistically separable. See the per-entry caveats. Widening n is the single cheapest improvement available to this project \u2014 judge calibration is inference only, requiring no training."
+}

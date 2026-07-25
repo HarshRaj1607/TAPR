@@ -1,0 +1,52 @@
+{
+  "benchmark": "StrategyQA",
+  "split_note": "StrategyQA test.json has no answer labels. We use a held-out 10% of the 2061-problem train split (207 problems), capped at 200 for evaluation. Both baseline and TAPR runs use RANDOM_SEED=42, so both see the identical eval set.",
+  "n_problems": 200,
+  "standard_error_pp": 3.4,
+  "provenance": "exact — transcribed from Colab run logs",
+
+  "experiment_1_trained_on_strategyqa": {
+    "description": "Models trained directly on StrategyQA (1854 train problems, 400 steps).",
+    "results": {
+      "zeroshot": {"accuracy": 0.6100, "correct": 122, "total": 200},
+      "baseline_orm": {"accuracy": 0.6250, "correct": 125, "total": 200},
+      "tapr": {"accuracy": 0.6350, "correct": 127, "total": 200}
+    },
+    "deltas": {
+      "baseline_vs_zeroshot_pp": 1.50,
+      "tapr_vs_zeroshot_pp": 2.50,
+      "tapr_vs_baseline_pp": 1.00
+    },
+    "interpretation": "The 1.0pp TAPR-vs-baseline gap is well within the 3.4pp standard error at n=200. Cannot claim TAPR > baseline from this experiment alone."
+  },
+
+  "experiment_2_cross_task_transfer": {
+    "description": "GSM8K-trained models evaluated on StrategyQA. Neither model saw any StrategyQA data during training. THIS IS THE KEY RESULT.",
+    "results": {
+      "zeroshot": {"accuracy": 0.6100, "correct": 122, "total": 200},
+      "baseline_orm_gsm8k_trained": {"accuracy": 0.5550, "correct": 111, "total": 200, "unparseable": 1},
+      "tapr_gsm8k_trained": {"accuracy": 0.6000, "correct": 120, "total": 200, "unparseable": 1}
+    },
+    "deltas": {
+      "baseline_vs_zeroshot_pp": -5.50,
+      "tapr_vs_zeroshot_pp": -1.00,
+      "tapr_vs_baseline_pp": 4.50
+    },
+    "interpretation": {
+      "headline": "Outcome-only GRPO on GSM8K degraded StrategyQA performance by 5.5pp below the untrained model. TAPR degraded it by only 1.0pp.",
+      "mechanism_hypothesis": "ORM optimizes for format compliance (numbered steps ending in ####), causing catastrophic over-specialization. TAPR optimizes for step-to-step logical validity, a more transferable property.",
+      "open_question": "Two competing explanations: (A) TAPR is an implicit regularizer that simply moves the policy less; (B) TAPR moves the policy a comparable amount but in a different direction. Distinguishing A from B requires the policy drift experiment (see ROADMAP.md).",
+      "caveat": "Single seed. Multi-seed replication is the top-priority next experiment."
+    }
+  },
+
+  "reward_degeneracy": {
+    "metric": "frac_reward_zero_std",
+    "definition": "Fraction of training groups where all G=4 rollouts received identical rewards, yielding zero advantage and zero gradient.",
+    "baseline_orm_range": [0.45, 0.85],
+    "baseline_orm_typical": 0.625,
+    "tapr_range": [0.0, 0.025],
+    "tapr_typical": 0.003,
+    "note": "StrategyQA baseline degeneracy (~0.625) exceeds GSM8K baseline degeneracy (~0.525). Hypothesis: on a binary yes/no task, an uncertain model tends to emit the same answer across all rollouts, collapsing reward variance more often than on numeric-answer tasks."
+  }
+}

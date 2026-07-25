@@ -1,0 +1,60 @@
+{
+  "benchmark": "GSM8K",
+  "split": "test",
+  "n_problems": 1319,
+  "note": "Full test split. Greedy decoding, max_new_tokens=512.",
+  "provenance": "exact — transcribed from Colab run logs",
+  "config": {
+    "base_model": "Qwen/Qwen2.5-3B-Instruct",
+    "judge_model": "Qwen/Qwen2.5-7B-Instruct",
+    "training_steps": 400,
+    "lambda_val": 0.3,
+    "lora": {"r": 16, "alpha": 32, "targets": ["q_proj", "k_proj", "v_proj", "o_proj"]},
+    "seed": 42
+  },
+  "results": {
+    "zeroshot": {
+      "accuracy": 0.7286,
+      "correct": 961,
+      "total": 1319,
+      "running_acc_checkpoints": {
+        "100": 0.6900, "200": 0.7250, "300": 0.7067, "400": 0.7175,
+        "500": 0.7180, "600": 0.7067, "700": 0.7086, "800": 0.7137,
+        "900": 0.7211, "1000": 0.7180, "1100": 0.7200, "1200": 0.7200,
+        "1300": 0.7292
+      }
+    },
+    "baseline_orm": {
+      "accuracy": 0.7703,
+      "correct": 1016,
+      "total": 1319,
+      "running_acc_checkpoints": {
+        "100": 0.7100, "200": 0.7450, "300": 0.7533, "400": 0.7675,
+        "500": 0.7560, "600": 0.7500, "700": 0.7543, "800": 0.7562,
+        "900": 0.7656, "1000": 0.7620, "1100": 0.7618, "1200": 0.7692,
+        "1300": 0.7715
+      }
+    },
+    "tapr": {
+      "accuracy": 0.7726,
+      "correct": 1019,
+      "total": 1319,
+      "running_acc_checkpoints": {
+        "100": 0.7400, "200": 0.7750, "300": 0.7767, "400": 0.7800,
+        "500": 0.7760, "600": 0.7667, "700": 0.7700, "800": 0.7688,
+        "900": 0.7744, "1000": 0.7710, "1100": 0.7673, "1200": 0.7700,
+        "1300": 0.7731
+      }
+    }
+  },
+  "deltas": {
+    "baseline_vs_zeroshot_pp": 4.17,
+    "tapr_vs_zeroshot_pp": 4.40,
+    "tapr_vs_baseline_pp": 0.23
+  },
+  "interpretation": {
+    "tapr_vs_baseline": "0.23pp = 3 additional correct answers out of 1319. Within noise. Not a claimable accuracy improvement at this training scale.",
+    "small_sample_warning": "At n=200 the TAPR-vs-baseline gap read as 3.0pp (0.7750 vs 0.7450). It collapsed to 0.23pp at full scale. Small-sample RL evaluation is unstable.",
+    "ceiling_effect": "Zero-shot is already at 72.86%, leaving only 27pp of headroom. Both trained models capture ~16% of available improvement."
+  }
+}
