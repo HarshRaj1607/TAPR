@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TAPR, Checkpoint 1: validating a transition signal before mixing it</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FBFAF7;
+  --ink:#1A2744;
+  --ink-soft:#3B5182;
+  --ink-wash:#EEF1F7;
+  --graphite:#5C6068;
+  --graphite-wash:#F0F0EE;
+  --graphite-rule:#B9BCC1;
+  --rule:#DCD8CE;
+  --text:#23262B;
+  --muted:#71757C;
+  --flag:#9A3B33;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--paper); color:var(--text);
+  font-family:"Public Sans",system-ui,sans-serif;
+  font-size:17px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:760px;margin:0 auto;padding:0 26px}
+
+/* ---------- masthead ---------- */
+header{padding:76px 0 34px;border-bottom:1px solid var(--rule)}
+.eyebrow{
+  font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 20px
+}
+h1{
+  font-family:"Newsreader",serif;font-weight:500;
+  font-size:clamp(2.1rem,5.2vw,3.05rem);line-height:1.12;
+  margin:0 0 16px;color:var(--ink);letter-spacing:-.015em
+}
+h1 em{font-style:italic;color:var(--ink-soft)}
+.standfirst{font-size:19px;color:var(--graphite);margin:0 0 26px;max-width:62ch}
+.byline{
+  font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--muted);
+  display:flex;flex-wrap:wrap;gap:8px 18px
+}
+
+/* ---------- voice legend ---------- */
+.legend{margin:34px 0 0;padding:22px 24px;border:1px solid var(--rule);background:#fff}
+.legend h2{
+  font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 14px;font-weight:500
+}
+.legend p{margin:0 0 12px;font-size:15.5px;line-height:1.6}
+.legend p:last-child{margin-bottom:0}
+.swatch{
+  display:inline-block;width:3px;height:.95em;vertical-align:-.12em;margin-right:9px;
+}
+.sw-ink{background:var(--ink)}
+.sw-ai{background:var(--graphite-rule)}
+
+/* ---------- sections ---------- */
+section{padding:52px 0;border-bottom:1px solid var(--rule)}
+.snum{
+  font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 10px
+}
+h2.head{
+  font-family:"Newsreader",serif;font-weight:500;font-size:2rem;line-height:1.2;
+  margin:0 0 8px;color:var(--ink);letter-spacing:-.01em
+}
+h3{
+  font-family:"Newsreader",serif;font-weight:600;font-size:1.22rem;
+  margin:34px 0 10px;color:var(--ink)
+}
+p{margin:0 0 17px}
+ul{margin:0 0 17px;padding-left:22px}
+li{margin-bottom:9px}
+
+/* ---------- the two voices ---------- */
+.voice{position:relative;padding-left:26px}
+.voice::before{
+  content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px
+}
+.mine::before{background:var(--ink)}
+.ai::before{
+  background:repeating-linear-gradient(
+    to bottom,var(--graphite-rule) 0 5px,transparent 5px 10px)
+}
+.vlabel{
+  font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;margin:0 0 18px;font-weight:500
+}
+.mine .vlabel{color:var(--ink-soft)}
+.ai .vlabel{color:var(--graphite)}
+.ai{color:#33373D}
+.ai-note{
+  background:var(--graphite-wash);border-left:3px solid var(--graphite-rule);
+  padding:16px 20px;margin:0 0 26px;font-size:15px;color:var(--graphite)
+}
+.ai-note strong{color:#3A3E44}
+
+/* inline AI insert inside a human section */
+.insert{
+  background:var(--graphite-wash);border:1px dashed var(--graphite-rule);
+  padding:20px 22px;margin:22px 0
+}
+.insert .vlabel{margin-bottom:14px}
+
+/* ---------- data ---------- */
+table{width:100%;border-collapse:collapse;margin:8px 0 20px;font-size:14.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule)}
+th{
+  font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);font-weight:500
+}
+td.num{font-family:"JetBrains Mono",monospace;text-align:right}
+tr.hi td{background:var(--ink-wash)}
+
+figure{margin:26px 0}
+figure img{width:100%;display:block;border:1px solid var(--rule);background:#fff}
+figcaption{font-size:13.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+
+.callout{
+  border-left:3px solid var(--flag);padding:4px 0 4px 18px;margin:22px 0;
+  font-size:16px;color:#3A2A28
+}
+code{
+  font-family:"JetBrains Mono",monospace;font-size:.88em;
+  background:var(--graphite-wash);padding:1px 5px
+}
+.pending{
+  border:1px dashed var(--graphite-rule);padding:18px 20px;margin:20px 0;
+  font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--muted)
+}
+a{color:var(--ink-soft);text-decoration:underline;text-underline-offset:2px}
+a:hover{color:var(--ink)}
+footer{padding:44px 0 80px;font-size:14px;color:var(--muted)}
+@media (max-width:620px){
+  body{font-size:16px}
+  .voice{padding-left:18px}
+  section{padding:40px 0}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">TAPR · Checkpoint 1 · Aug 2026</p>
+  <h1>Before asking how to mix a process reward,<br><em>check whether the signal works at all</em></h1>
+  <p class="standfirst">
+    An inference-only experiment on GSM8K reasoning traces, testing whether a judge
+    that scores transitions catches broken reasoning that a judge scoring steps in
+    isolation misses. It mostly did not, and the reasons turned out to be more
+    interesting than the result.
+  </p>
+  <div class="byline">
+    <span>Harsh Raj</span><span>Independent</span><span>Undergraduate, CSE</span>
+  </div>
+
+  <div class="legend">
+    <h2>Two voices on this page</h2>
+    <p><span class="swatch sw-ink"></span><strong>Solid blue rule.</strong> Written by me,
+      from handwritten notes, in one pass. Not edited by a model. The gaps, the loose
+      phrasing and the places where I am unsure are left in on purpose. If you want to
+      know what I can actually do, read these parts.</p>
+    <p><span class="swatch sw-ai"></span><strong>Dashed grey rule.</strong> Written with
+      Claude's help. Numbers, tables, figures, and detail I asked it to fill in. It is
+      marked so you can tell the difference, and so the work does not look thinner than
+      it is.</p>
+  </div>
+</header>
+
+<!-- ============ 1 CLAIM ============ -->
+<section>
+  <div class="voice mine">
+    <p class="vlabel">My writing</p>
+    <p class="snum">01</p>
+    <h2 class="head">Claim</h2>
+
+    <p>Outcome only reward is incapable of catching poor reasoning, since models have
+    shown to produce the right output, probably from memory, despite poor reasoning, and
+    vice versa, right reasoning and wrong outcome. The isolated step scorer scores steps
+    in isolation, without context, so steps can be locally correct but lead to totally
+    poor reasoning overall. This is documented in multiple papers.</p>
+
+    <p>What I found was that most papers don't separate whether the signal is weak vs
+    mixing the PRM signal with outcome reward conflicts.</p>
+
+    <p><strong>TAPR</strong> rewards the transition (simplification, conclusion,
+    substitution, implication) based on its validity. Given everything we have seen so
+    far in the reasoning trace, does the transition follow, is it valid?</p>
+
+    <p><strong>Hypothesis.</strong> The transition judge scorer catches poor reasoning
+    much better than the isolated judge, and within outcome variance is more in the
+    transition judge scores.</p>
+
+    <div class="insert">
+      <p class="vlabel">Added with Claude · the specific papers behind "most papers don't separate"</p>
+      <p style="margin-bottom:10px">Three papers document the failure of isolated step
+      scoring but none of them validate the signal on its own before studying how to
+      combine it:</p>
+      <ul style="margin-bottom:0">
+        <li><em>Reward Granularity in RLVR</em> (2607.02869). Process only supervision
+        gets the best accuracy (0.64) and the worst trace validity (0.22, below the
+        untrained base at 0.56). They vary the mixing weight and attribute the anomaly
+        at low process weight to conflicting optimization signals.</li>
+        <li><em>PROGRS</em> (2604.02341). States that PRMs assign high scores to locally
+        coherent reasoning that still ends in an incorrect answer, then builds machinery
+        (outcome conditioned centering) to constrain the signal rather than testing it.</li>
+        <li><em>Samineni et al.</em> (2510.18176). Finds RL improves local coherence
+        without correctness following, using an LLM error classifier that reaches 57.8%
+        accuracy against human annotation.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2 METHOD ============ -->
+<section>
+  <div class="voice mine">
+    <p class="vlabel">My writing</p>
+    <p class="snum">02</p>
+    <h2 class="head">Methodology</h2>
+
+    <p>Qwen2.5-3B generates 5 traces per question, started with 30 questions, and our
+    scorers score those traces independently.</p>
+
+    <h3>Scorers</h3>
+
+    <p><strong>isolated judge.</strong> Sees the question and only one step, no other
+    content. Scores the step based only on mathematical validity.</p>
+
+    <p><strong>transition.</strong> Scores the transition based on validity: no
+    contradiction, value traceable, relevant, mathematically correct. We give the
+    definition of valid to the judge.</p>
+
+    <p>First we tried using a 0 to 10 scale with different bands, low band for poor
+    reasoning, middle band for reasoning that is valid but does not advance the problem.
+    Found the judge doesn't use the scale well and restricts itself to either a very low
+    or a very high score. Moved to a 0 to 1 scale with no described bands.</p>
+
+    <p><strong>bare.</strong> Scores the transition just like the previous judge, but we
+    leave the judgment of what is a valid transition to the judge and do not define it
+    ourselves. Scale: similar, first used 0 to 10, switched to 0 to 1.</p>
+
+    <p>The idea to add this new scorer came after reading the <em>interwhen</em> paper,
+    where I realised that the real judgement, that is what should be done vs avoided,
+    what is the right next step, ie a reasoning step, a transition, a tool call, must lie
+    with the agent or judge itself. In interwhen, when the human writes the policy
+    document, they are doing the real heavy lifting when it comes to judgment and its
+    quality, and not the agent.</p>
+
+    <div class="insert">
+      <p class="vlabel">Added with Claude · exact band values, and two design details</p>
+      <p>The banded prompt used four bands: 0 to 3 when any premise contradicts the
+      problem or is fabricated or the arithmetic is wrong, 4 to 6 when premises and
+      arithmetic are fine but the move does not advance the problem, 7 to 8 for valid
+      and advancing with minor issues, 9 to 10 when all three checks pass cleanly.</p>
+      <p>Two things that matter for reading the results. The prefix-only property is
+      enforced by slicing the trace in code, so a judge scoring step <em>i</em> is never
+      shown step <em>i</em> or later, rather than being asked politely not to look. And
+      the transition judge can return <code>NA</code> when a step restates the problem
+      instead of inferring anything, so setup lines do not count as perfect transitions.</p>
+      <p style="margin-bottom:0">The judge model is Qwen2.5-7B-Instruct, later
+      Qwen2.5-14B-Instruct, 4-bit quantized, run with sampling off so scores are
+      deterministic.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3 RESULT ============ -->
+<section>
+  <div class="voice mine">
+    <p class="vlabel">My writing</p>
+    <p class="snum">03</p>
+    <h2 class="head">Result</h2>
+
+    <p>Total traces generated were 150, that is 30 questions by 5 traces per question.
+    Of those traces, 42 were wrong answer, but 15 of them, 36%, were format failures.
+    That is, the reasoning trace reached the correct final value, computed 70,000 in one
+    case, but wrote <code>#### 7.0</code> as the final answer.</p>
+
+    <p>I started with the 7B Qwen as the judge, but found that it scored 10 out of 10 on
+    99% of the transitions. In one trace the model generated "7 days in a week" when the
+    problem said 3 times a week. The 7B judge wrote "unsourced, but commonly known" and
+    gave it 7 out of 10.</p>
+
+    <p>Therefore I switched to the 14B judge, which scored 0 out of 10 on the same 7 days
+    a week statement, correctly identifying the wrong reasoning. So I went ahead with the
+    14B judge.</p>
+  </div>
+
+  <div class="voice ai" style="margin-top:34px">
+    <p class="vlabel">Written with Claude · the numbers</p>
+
+    <div class="ai-note">
+      <strong>What the table shows.</strong> Separation is the probability that a
+      randomly chosen sound trace scores above a randomly chosen broken trace. 50% is
+      chance. Each trace is summarised by its lowest step score, on the view that one
+      broken link breaks a chain. Format failures are removed from the broken group,
+      leaving 96 sound and 27 broken traces. Intervals are bootstrap 95%.
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Scorer</th><th>Sound</th><th>Broken</th><th>Gap</th><th>Separation</th><th>95% CI</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>isolated</td><td class="num">6.72</td><td class="num">4.30</td><td class="num">2.42</td><td class="num">71.8%</td><td class="num">58.6 – 84.2</td></tr>
+        <tr class="hi"><td>transition</td><td class="num">8.18</td><td class="num">4.60</td><td class="num">3.58</td><td class="num">76.1%</td><td class="num">64.2 – 86.9</td></tr>
+        <tr><td>bare</td><td class="num">8.50</td><td class="num">5.70</td><td class="num">2.80</td><td class="num">75.3%</td><td class="num">65.3 – 85.0</td></tr>
+      </tbody>
+    </table>
+
+    <figure>
+      <img src="fig/fig_separation.png" alt="Separation with 95% confidence intervals for the three scorers, all overlapping">
+      <figcaption>Every interval clears chance. Every interval also contains every other
+      scorer's point estimate.</figcaption>
+    </figure>
+
+    <h3>Within outcome spread</h3>
+    <p>Traces of the same problem that reached the same final answer. If their scores are
+    identical, the signal adds nothing over the outcome reward, because a group with zero
+    reward variance produces zero advantage under GRPO and teaches the policy nothing.</p>
+
+    <table>
+      <thead><tr><th>Scorer</th><th>Groups</th><th>Mean SD</th><th>Zero variance</th></tr></thead>
+      <tbody>
+        <tr><td>isolated</td><td class="num">34</td><td class="num">2.07</td><td class="num">5 / 34</td></tr>
+        <tr><td>transition</td><td class="num">33</td><td class="num">1.54</td><td class="num">9 / 33</td></tr>
+        <tr><td>bare</td><td class="num">34</td><td class="num">1.43</td><td class="num">15 / 34</td></tr>
+      </tbody>
+    </table>
+
+    <h3>How the judges used the scale</h3>
+    <figure>
+      <img src="fig/fig_distributions.png" alt="Score distributions for five scorers, showing every context-aware scorer piling up at a single value">
+      <figcaption>The banded transition judge put 448 of 519 scores on exactly 9 and
+      never once used 10. Removing the bands and moving to a 0 to 1 scale lowered the
+      pile-up from 86% to 64% but did not remove it. The isolated judge, which is also
+      banded, has the widest spread of all five.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ 4 INTERPRETATION ============ -->
+<section>
+  <div class="voice mine">
+    <p class="vlabel">My writing</p>
+    <p class="snum">04</p>
+    <h2 class="head">Interpretation</h2>
+
+    <p>The CIs overlap. At n = 27 broken traces it is not feasible to rank the scorers.
+    However each judge performs better than pure chance.</p>
+
+    <p>Because of the previously mentioned scale, 0 to 10, and band problem, the within
+    outcome variance also didn't go our way, since our transition judge never used the
+    scale properly.</p>
+
+    <p>The fix was to use a 0 to 1 scale instead, with no bands. This was only tested on
+    30 traces as of now.</p>
+
+    <div class="insert">
+      <p class="vlabel">Added with Claude · where that explanation runs out</p>
+      <p>Stated as a hypothesis rather than a cause, because the evidence only partly
+      supports it. Removing the bands raised the spread, 86% down to 64% on the modal
+      value, so the bands were doing something. But the pile-up did not go away, and the
+      unbanded test ran on 30 traces while the banded run used 138, so the comparison is
+      across different problems and not a clean substitution.</p>
+      <p style="margin-bottom:0">The stronger objection is that the isolated judge is
+      also banded and has the widest spread of any scorer. So bands cannot be the whole
+      story. What separates isolated from the rest is that it never sees the prior chain.
+      That suggests a different reading: given the full chain, most individual moves
+      genuinely do follow, so a judge asked "does this follow" answers yes almost always.
+      If that is right, broken transitions are a rare event on GSM8K and the ceiling is a
+      property of the task rather than a defect in the prompt.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5 WHAT NEXT ============ -->
+<section>
+  <div class="voice ai">
+    <p class="vlabel">Written with Claude · from decisions I made during the work</p>
+    <p class="snum">05</p>
+    <h2 class="head">What I would try next</h2>
+
+    <p><strong>More dimensions in the validity definition.</strong> The current
+    definition has three parts and most steps satisfy all three, which is part of why the
+    scores bunch at the top. A finer definition would give the judge somewhere to put a
+    step that is valid but weak, and that headroom is what within outcome variance needs.</p>
+
+    <p><strong>Accept that broken transitions are rare, at least on GSM8K.</strong> If
+    most moves are fine, the information sits in the tail rather than in the average.
+    That points at counting failures instead of averaging scores, and at picking a harder
+    dataset where local breaks are more common.</p>
+
+    <p><strong>More questions.</strong> Everything here rests on 27 genuinely broken
+    traces. At the observed rate of roughly 30% wrong answers, of which about two thirds
+    are real reasoning failures, reaching 85 broken traces needs somewhere near 450
+    generations. That is the cheapest way to make any ranking claim possible at all.</p>
+
+    <p><strong>Run the unbanded scorers on the full set.</strong> The 0 to 1 result is
+    from 30 traces and cannot be compared directly with the 138 trace banded run.</p>
+  </div>
+</section>
+
+<!-- ============ 6 COLLABORATION ============ -->
+<section>
+  <div class="voice ai">
+    <p class="vlabel">Written with Claude · my account of the process</p>
+    <p class="snum">06</p>
+    <h2 class="head">How I worked with Claude</h2>
+
+    <p>I used an attempt first rule. Reading the literature, forming the hypothesis,
+    writing the claim, designing the experiment, writing code, interpreting results: I
+    tried each part myself before showing it to a model. Only after I had attempted
+    something a few times and hit a threshold did I hand it over. The threshold was
+    usually one of: days without progress, not knowing what to do next, not being able to
+    write a piece of code or read a result, or being too tired to keep attacking it
+    alone.</p>
+
+    <p>Then I would put my attempt in front of Claude to be critiqued, take the critique
+    back, and sharpen it myself. After a few rounds of that, I was often the one catching
+    Claude's mistakes rather than the other way round.</p>
+
+    <div class="ai-note">
+      <strong>Claude's note on that last sentence.</strong> It splits by type rather than
+      by count. Harsh caught the conceptual and design errors: that asking the judge for a
+      score before its reasoning produced confident rationalisation after the fact, that
+      "wrong final answer" does not mean "broken reasoning", that the real failure in the
+      7 days a week case was contradiction rather than an unsourced value, and that a
+      scorer with no stated criteria matching one with criteria was the result rather than
+      a failure. Claude caught the technical and statistical ones: parsing crashes,
+      truncated traces, that the confidence intervals overlapped when only point estimates
+      had been looked at, and that format failures had never been excluded from any
+      analysis. So Harsh was more reliable about what the work should be, Claude about
+      whether the machinery was sound.
+    </div>
+
+    <p>What did not get delegated was the conceptual layer. Every decision that changed
+    what this experiment measures, the claim, the prompts, the scoring rules, what counts
+    as a broken trace, and what would count as failure, was written before a model saw
+    it.</p>
+  </div>
+</section>
+
+<!-- ============ 7 PRIMER ============ -->
+<section>
+  <div class="voice ai">
+    <p class="vlabel">Written with Claude · earlier work this builds on</p>
+    <p class="snum">07</p>
+    <h2 class="head">Where this came from</h2>
+
+    <p>An earlier version of TAPR was built during a hackathon and trained the reward
+    rather than validating it. Qwen2.5-3B was fine tuned with GRPO on GSM8K using a live
+    7B judge, with a transition reward mixed into the outcome reward.</p>
+
+    <p>The one clean result was mechanical. Outcome only training left about half of all
+    problem groups with zero reward variance, which means zero advantage and no learning
+    signal from those problems. Adding the transition reward drove that to near zero on
+    both datasets tested. The accuracy results were weaker: in-domain GSM8K accuracy moved
+    by less than half a point, and a cross-task gap on StrategyQA came from a single seed
+    with a confidence interval that includes zero.</p>
+
+    <p>That is why this checkpoint exists. The training run could not tell whether the
+    signal was any good, only that adding something dense changed the optimization. The
+    write-up of that earlier work, with the results marked by how much they can be
+    trusted, is <a href="https://github.com/HarshRaj1607/TAPR/tree/main/hackathon">here</a>.</p>
+  </div>
+</section>
+
+<!-- ============ PENDING ============ -->
+<section>
+  <div class="voice mine">
+    <p class="snum">08</p>
+    <h2 class="head">Still to come</h2>
+    <div class="pending">
+      [ pending ] Holes in this work, written by me after using Claude as an adversary<br>
+      [ pending ] Link to code and data
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Checkpoint 1 is inference only. No policy was trained, so nothing here is a claim
+  about downstream accuracy. Every number on this page comes from a single scoring run
+  with sampling disabled.</p>
+</footer>
+
+</div>
+</body>
+</html>

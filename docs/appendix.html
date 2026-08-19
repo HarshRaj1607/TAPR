@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TAPR Checkpoint 1 — Technical appendix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F4F4F2;
+  --ink:#1A2744;
+  --ink-soft:#3B5182;
+  --graphite:#4A4E55;
+  --graphite-wash:#EAEAE7;
+  --graphite-rule:#B9BCC1;
+  --rule:#D4D4CF;
+  --text:#26292E;
+  --muted:#71757C;
+  --flag:#9A3B33;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--paper); color:var(--text);
+  font-family:"Public Sans",system-ui,sans-serif;
+  font-size:16.5px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:780px;margin:0 auto;padding:0 26px}
+
+header{padding:56px 0 30px;border-bottom:2px solid var(--graphite)}
+.eyebrow{
+  font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 18px
+}
+.back{
+  font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.06em;
+  display:inline-block;margin:0 0 26px
+}
+h1{
+  font-family:"Newsreader",serif;font-weight:500;
+  font-size:clamp(1.9rem,4.4vw,2.5rem);line-height:1.15;
+  margin:0 0 14px;color:var(--ink);letter-spacing:-.012em
+}
+.standfirst{font-size:17.5px;color:var(--graphite);margin:0 0 0;max-width:64ch}
+
+.provenance{
+  margin:26px 0 0;padding:18px 22px;
+  border-left:3px solid var(--graphite-rule);background:var(--graphite-wash);
+  font-size:15px;color:var(--graphite)
+}
+.provenance strong{color:#2E3238}
+.provenance p{margin:0 0 10px}
+.provenance p:last-child{margin-bottom:0}
+
+nav.toc{padding:26px 0;border-bottom:1px solid var(--rule);font-size:15px}
+nav.toc ol{margin:0;padding-left:20px;columns:2;column-gap:34px}
+nav.toc li{margin-bottom:6px}
+
+section{padding:42px 0;border-bottom:1px solid var(--rule)}
+.snum{
+  font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 10px
+}
+h2.head{
+  font-family:"Newsreader",serif;font-weight:500;font-size:1.75rem;line-height:1.2;
+  margin:0 0 14px;color:var(--ink);letter-spacing:-.01em
+}
+h3{
+  font-family:"Newsreader",serif;font-weight:600;font-size:1.16rem;
+  margin:30px 0 10px;color:var(--ink)
+}
+p{margin:0 0 15px}
+ul,ol.body{margin:0 0 15px;padding-left:22px}
+li{margin-bottom:8px}
+
+table{width:100%;border-collapse:collapse;margin:8px 0 18px;font-size:14px}
+th,td{text-align:left;padding:8px 11px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{
+  font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);font-weight:500
+}
+td.num{font-family:"JetBrains Mono",monospace;text-align:right;white-space:nowrap}
+
+code{
+  font-family:"JetBrains Mono",monospace;font-size:.88em;
+  background:var(--graphite-wash);padding:1px 5px
+}
+pre{
+  background:#fff;border:1px solid var(--rule);padding:16px 18px;overflow-x:auto;
+  font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:1.55;margin:0 0 18px
+}
+pre.prompt{background:#fff;font-size:12px;white-space:pre-wrap}
+
+.tag{
+  font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;padding:2px 7px;vertical-align:1px;
+  border:1px solid var(--graphite-rule);color:var(--graphite);margin-right:7px
+}
+.tag.pred{border-color:var(--flag);color:var(--flag)}
+
+.flagbox{
+  border-left:3px solid var(--flag);padding:4px 0 4px 18px;margin:20px 0;
+  font-size:15.5px;color:#3A2A28
+}
+.note{
+  background:var(--graphite-wash);border:1px dashed var(--graphite-rule);
+  padding:16px 20px;margin:20px 0;font-size:15px;color:var(--graphite)
+}
+.note p:last-child{margin-bottom:0}
+
+a{color:var(--ink-soft);text-decoration:underline;text-underline-offset:2px}
+a:hover{color:var(--ink)}
+footer{padding:40px 0 80px;font-size:14px;color:var(--muted)}
+@media (max-width:640px){
+  body{font-size:15.5px}
+  nav.toc ol{columns:1}
+  section{padding:34px 0}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <a class="back" href="index.html">&larr; Back to the main write-up</a>
+  <p class="eyebrow">TAPR · Checkpoint 1 · Technical appendix</p>
+  <h1>What was run, what the numbers mean, and what they do not support</h1>
+  <p class="standfirst">
+    A reference companion to the main page. Exact prompts, exact counts, and a
+    plain account of every confound and limitation in the experiment.
+  </p>
+
+  <div class="provenance">
+    <p><strong>This page is written by Claude, an LLM, at Harsh's request.</strong>
+    The main write-up is his: his claim, his design, his prompts, his reading of the
+    results. This page exists so that a reader who wants the underlying detail can get
+    it without that detail crowding out his argument.</p>
+    <p>Every figure below was recomputed from the raw <code>.jsonl</code> output rather
+    than copied from notes. Two labels are used throughout: <span class="tag">shown</span>
+    for something measured, and <span class="tag pred">predicted</span> for something
+    argued but not yet tested.</p>
+  </div>
+</header>
+
+<nav class="toc">
+  <ol>
+    <li><a href="#design">Why inference, not training</a></li>
+    <li><a href="#scorers">The five scorers</a></li>
+    <li><a href="#prompts">The prompts, in full</a></li>
+    <li><a href="#counts">Trace accounting</a></li>
+    <li><a href="#judge">Judge scale</a></li>
+    <li><a href="#results">Results, recomputed</a></li>
+    <li><a href="#confounds">Confounds</a></li>
+    <li><a href="#supports">What the results support</a></li>
+    <li><a href="#limits">Limitations</a></li>
+    <li><a href="#repro">Reproducing this</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="design">
+  <p class="snum">01</p>
+  <h2 class="head">Why inference, not training</h2>
+
+  <p>An earlier version of this work trained a policy with GRPO using a transition
+  reward. That design has an attribution problem: when the run underperforms, the cause
+  could be the signal, the mixing weight, the KL penalty, the learning rate, or the seed.
+  Nothing can be isolated.</p>
+
+  <p>Checkpoint 1 removes all of it. <strong>No policy is trained.</strong> A fixed set
+  of traces is scored by different scorers and the scores are compared. The only thing
+  that varies between conditions is the prompt given to the judge. Everything else — the
+  traces, the judge model, the decoding settings — is held identical.</p>
+
+  <p>The cost of this choice is that Checkpoint 1 cannot say anything about downstream
+  accuracy. It is a measurement of the signal, not of what the signal does to a policy.</p>
+</section>
+
+<!-- 2 -->
+<section id="scorers">
+  <p class="snum">02</p>
+  <h2 class="head">The five scorers</h2>
+
+  <p>Same judge model throughout. Only the prompt differs.</p>
+
+  <table>
+    <thead><tr>
+      <th>Scorer</th><th>What it sees</th><th>Criteria</th><th>Scale</th><th>NA</th>
+    </tr></thead>
+    <tbody>
+      <tr><td><code>isolated</code></td><td>question + ONE step</td><td>yes, banded</td><td class="num">0–10</td><td>no</td></tr>
+      <tr><td><code>transition</code></td><td>question + all prior steps + this step</td><td>yes, banded</td><td class="num">0–10</td><td><strong>yes</strong></td></tr>
+      <tr><td><code>bare</code></td><td>question + all prior steps + this step</td><td>none</td><td class="num">0–10</td><td>no</td></tr>
+      <tr><td><code>transition_free</code></td><td>question + all prior steps + this step</td><td>yes, unbanded</td><td class="num">0–1</td><td>no</td></tr>
+      <tr><td><code>bare_free</code></td><td>question + all prior steps + this step</td><td>none</td><td class="num">0–1</td><td>no</td></tr>
+    </tbody>
+  </table>
+
+  <p><code>bare</code> is the control, and it is the most interesting design decision on
+  the page. If a scorer given <em>no</em> criteria discriminates as well as one given three
+  explicit conditions, then the explicit conditions add nothing over the model's own notion
+  of entailment. That converts a philosophical question — where does the judgment actually
+  live — into a measurement.</p>
+
+  <h3>Prefix-only is structural, not instructed</h3>
+
+  <p>A judge scoring step <em>i</em> is shown <code>steps[:i]</code>. The later steps are
+  not passed to the model at all. This matters because a prompt that merely <em>asks</em>
+  a model to ignore what it can see is not a control — the information is still in context.
+  Here it is absent by construction.</p>
+</section>
+
+<!-- 3 -->
+<section id="prompts">
+  <p class="snum">03</p>
+  <h2 class="head">The prompts, in full</h2>
+
+  <p>These are the instruments. The differences between them are the entire experiment,
+  so they are reproduced verbatim rather than summarised.</p>
+
+  <h3>isolated</h3>
+<pre class="prompt">You are checking one statement from a reasoning trace.
+
+Problem: {question}
+
+Statement:
+{step}
+
+Judge ONLY this statement, on its own. You have no access to any other step,
+so do not guess what came before.
+
+First do the check, then score.
+
+CHECK: State the arithmetic or mathematical claim this statement makes, and
+verify it. Is the arithmetic correct? Is the claim well-defined?
+
+Then score 0-10:
+  0-3   the arithmetic is wrong
+  4-6   no clear mathematical claim, or too vague to verify
+  7-8   correct but imprecisely stated
+  9-10  arithmetic correct and the claim is well-defined
+
+Respond in exactly this format:
+CHECK: &lt;your check&gt;
+SCORE: &lt;integer 0-10&gt;</pre>
+
+  <h3>transition</h3>
+<pre class="prompt">You are checking whether one reasoning move is valid.
+
+Problem: {question}
+
+Reasoning so far:
+{prior}
+
+Next move:
+{step}
+
+FIRST decide whether this is a transition at all.
+A transition performs an inference: it concludes, substitutes, simplifies, or
+derives something from what came before. A move that merely restates a fact
+from the problem, or introduces a piece of common knowledge without inferring
+anything, is NOT a transition. If it is not a transition, write SCORE: NA.
+
+If it IS a transition, work through all three checks BEFORE scoring.
+Be skeptical. Do not assume a number is legitimate because it sounds plausible.
+
+CHECK 1 - PREMISES. List every number the move uses. Put each into one bucket:
+  GIVEN        - stated in the problem, or derived in an earlier step
+  WORLD        - a genuine fact not in the problem (e.g. a dozen is 12),
+                 and nothing in the problem says otherwise
+  CONTRADICTS  - the problem already specified this quantity, and the move
+                 uses a different value for it
+  FABRICATED   - appears from nowhere and is not a genuine world fact
+
+CHECK 2 - OPERATION. State the operation performed. Is it legitimate here,
+and is the arithmetic correct?
+
+CHECK 3 - DIRECTION. Does this move get closer to what the problem asks, or
+does it answer a different question or return to an earlier state?
+
+Then score 0-10:
+  0-3   any premise is CONTRADICTS or FABRICATED, or the arithmetic is wrong
+  4-6   premises and arithmetic fine, but the move does not advance the problem
+  7-8   valid and advancing, with minor issues
+  9-10  all three checks pass cleanly
+
+A correct operation on a CONTRADICTS or FABRICATED premise still scores 0-3.
+WORLD premises are acceptable and cost nothing.
+
+If you are unsure whether a premise contradicts the problem, or unsure whether
+the move is valid, score it LOW. Do not resolve doubt in favour of the move.
+
+Judge only on the reasoning shown above. Do not assume later steps.
+
+Respond in exactly this format:
+CHECK 1: &lt;each number and its bucket&gt;
+CHECK 2: &lt;operation&gt;
+CHECK 3: &lt;direction&gt;
+SCORE: &lt;integer 0-10, or NA if not a transition&gt;</pre>
+
+  <h3>bare</h3>
+<pre class="prompt">You are checking whether one reasoning move is valid.
+
+Problem: {question}
+
+Reasoning so far:
+{prior}
+
+Next move:
+{step}
+
+Does this move follow from what came before? Think it through before scoring.
+
+Respond in exactly this format:
+REASONING: &lt;your reasoning&gt;
+SCORE: &lt;integer 0-10&gt;</pre>
+
+  <h3>transition_free</h3>
+<pre class="prompt">You are judging one reasoning move.
+
+Problem: {question}
+
+Reasoning so far:
+{prior}
+
+Next move:
+{step}
+
+Judge the quality of this move on these metrics:
+- the values it uses are stated in the problem or derived in the reasoning so far,
+  and none contradict what the problem says
+- the operation is legitimate and the arithmetic is correct
+- the move advances toward what the problem asks
+
+Score the quality of this move between 0 and 1.
+
+Respond in exactly this format:
+REASONING: &lt;your reasoning&gt;
+SCORE: &lt;number between 0 and 1&gt;</pre>
+
+  <h3>bare_free</h3>
+<pre class="prompt">You are judging one reasoning move.
+
+Problem: {question}
+
+Reasoning so far:
+{prior}
+
+Next move:
+{step}
+
+Does this move follow from what came before?
+
+Score the quality of this move between 0 and 1.
+
+Respond in exactly this format:
+REASONING: &lt;your reasoning&gt;
+SCORE: &lt;number between 0 and 1&gt;</pre>
+
+  <div class="note">
+    <p><strong>One design detail worth flagging.</strong> The reasoning is requested
+    <em>before</em> the score in every prompt. An earlier version put <code>SCORE:</code>
+    first because it was easier to parse. That produced a judge which emitted a number and
+    then wrote a justification for it — rationalisation, not reasoning. The ordering was
+    reversed and the run was redone. This was an error in the harness design, and it cost
+    a full scoring run.</p>
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="counts">
+  <p class="snum">04</p>
+  <h2 class="head">Trace accounting</h2>
+
+  <p>Generation: Qwen2.5-3B-Instruct, bf16, 30 GSM8K test problems × 5 samples,
+  temperature 0.9, top_p 0.95, 512 max new tokens.</p>
+
+<pre>150   generated
+ -12  unparseable (no step segmentation, or no #### marker)
+────
+138   usable and scored
+       ├─  96  correct final answer
+       └─  42  wrong final answer
+                ├─ 15  FORMAT failures
+                └─ 27  genuinely broken reasoning
+────
+123   in the separation analysis (96 sound + 27 broken;
+      the 15 format failures excluded from both groups)</pre>
+
+  <p>Steps per trace: min 1, median 4, max 8. <strong>586 steps total.</strong></p>
+
+  <h3>What a format failure is</h3>
+
+  <p>The reasoning reaches the correct value and the final-answer marker is mistyped.
+  In one case the trace computed 70,000 and wrote <code>#### 7.0</code>. Graded by final
+  answer, that is a wrong answer. Graded by reasoning, it is sound.</p>
+
+  <div class="flagbox">
+    <span class="tag">shown</span> <strong>36% of all wrong-answer traces here are format
+    failures, not reasoning failures.</strong> Any paper that labels reasoning quality by
+    final-answer correctness on this setup mislabels roughly a third of its failures. This
+    is a finding in its own right, and it was found by reading traces rather than
+    aggregates.
+  </div>
+
+  <h3>What "sound" actually means here</h3>
+
+  <p>The 96 traces in the sound group are the ones that reached the correct final answer.
+  They were <em>not</em> verified as having sound reasoning. Some fraction of them will
+  have reached the right number by a wrong route, which is the exact failure mode the
+  project is about. So the sound group is better described as
+  <strong>not-known-broken</strong>. This is the largest unaddressed weakness in the
+  experiment, and it biases against finding an effect: contamination in the sound group
+  makes every scorer look worse than it is.</p>
+</section>
+
+<!-- 5 -->
+<section id="judge">
+  <p class="snum">05</p>
+  <h2 class="head">Judge scale: 7B is unusable, 14B works</h2>
+
+  <p>Both judges 4-bit quantized (nf4, double quant), <code>do_sample=False</code>, so
+  scores are deterministic.</p>
+
+  <p><strong>Qwen2.5-7B-Instruct</strong> scored 10 on 99% of steps. On a trace where the
+  generator invented "7 days in a week" when the problem said <em>3 times a week</em>, the
+  7B judge described the value as commonly known and gave it 7/10 — and assigned a
+  <code>FABRICATED</code> bucket to a number that did not appear in the step at all.</p>
+
+  <p><strong>Qwen2.5-14B-Instruct</strong> scored the same step <strong>0/10</strong>,
+  correctly identifying the contradiction with the problem statement.</p>
+
+  <div class="flagbox">
+    <span class="tag">shown</span> <strong>LLM-as-judge for transition validity is
+    unreliable at 7B scale.</strong> This is worth reporting independently of anything
+    else here: a 7B judge on this task does not merely score generously, it fabricates
+    its own justifications.
+  </div>
+
+  <p>A note on what this does and does not establish. It is one model family, two sizes,
+  and the diagnosis came from reading judge output on a handful of traces rather than from
+  a systematic sweep. The direction is clear; the threshold is not.</p>
+</section>
+
+<!-- 6 -->
+<section id="results">
+  <p class="snum">06</p>
+  <h2 class="head">Results, recomputed</h2>
+
+  <h3>Separation</h3>
+
+  <p>Separation is the probability that a randomly chosen sound trace scores above a
+  randomly chosen broken trace. 50% is chance. Each trace is summarised by its
+  <strong>lowest</strong> step score, on the view that one broken link breaks a chain.
+  n = 96 sound, 27 broken. Bootstrap 95% intervals.</p>
+
+  <table>
+    <thead><tr>
+      <th>Scorer</th><th>Sound</th><th>Broken</th><th>Gap</th><th>Separation</th><th>95% CI</th>
+    </tr></thead>
+    <tbody>
+      <tr><td><code>isolated</code></td><td class="num">6.72</td><td class="num">4.30</td><td class="num">2.42</td><td class="num">71.8%</td><td class="num">58.6 – 84.2</td></tr>
+      <tr><td><code>transition</code></td><td class="num">8.18</td><td class="num">4.60</td><td class="num">3.58</td><td class="num">76.1%</td><td class="num">64.2 – 86.9</td></tr>
+      <tr><td><code>bare</code></td><td class="num">8.50</td><td class="num">5.70</td><td class="num">2.80</td><td class="num">75.3%</td><td class="num">65.3 – 85.0</td></tr>
+    </tbody>
+  </table>
+
+  <p>Every interval clears 50%, so all three judges do detect broken reasoning. Every
+  interval also contains every other scorer's point estimate.
+  <strong>At n = 27 broken traces the scorers cannot be ranked.</strong> Transition's
+  higher point estimate is not evidence that transition is better, and the main page is
+  correct not to claim otherwise.</p>
+
+  <h3>Within-outcome variance</h3>
+
+  <p>Groups are traces of the same problem that reached the same final answer, with at
+  least two members. This is the metric that matters most for the eventual training
+  application: under GRPO, a group with zero reward variance produces zero advantage and
+  contributes no gradient. A problem whose traces all score identically teaches the policy
+  nothing.</p>
+
+  <table>
+    <thead><tr><th>Scorer</th><th>Groups</th><th>Mean SD</th><th>Zero variance</th></tr></thead>
+    <tbody>
+      <tr><td><code>isolated</code></td><td class="num">34</td><td class="num">2.07</td><td class="num">5 / 34</td></tr>
+      <tr><td><code>transition</code></td><td class="num">33</td><td class="num">1.54</td><td class="num">9 / 33</td></tr>
+      <tr><td><code>bare</code></td><td class="num">34</td><td class="num">1.43</td><td class="num">15 / 34</td></tr>
+    </tbody>
+  </table>
+
+  <div class="flagbox">
+    <span class="tag">shown</span> <strong>This is the result that went the wrong way, and
+    it is the important one.</strong> The hypothesis predicted the transition judge would
+    produce <em>more</em> within-group spread than the isolated judge. It produced less:
+    9/33 zero-variance groups against 5/34, and a lower mean SD. On this evidence the
+    transition signal does not supply the within-group gradient TAPR would need.
+  </div>
+
+  <h3>Scale usage</h3>
+
+  <table>
+    <thead><tr>
+      <th>Scorer</th><th>Calls</th><th>Scored</th><th>NA</th><th>Parse fail</th>
+      <th>Modal</th><th>SD</th><th>Distinct</th>
+    </tr></thead>
+    <tbody>
+      <tr><td><code>isolated</code></td><td class="num">586</td><td class="num">586</td><td class="num">0</td><td class="num">0</td><td class="num">34.3%</td><td class="num">2.14</td><td class="num">10</td></tr>
+      <tr><td><code>transition</code></td><td class="num">586</td><td class="num">519</td><td class="num">64</td><td class="num">3</td><td class="num">86.3%</td><td class="num">1.77</td><td class="num">8</td></tr>
+      <tr><td><code>bare</code></td><td class="num">586</td><td class="num">581</td><td class="num">0</td><td class="num">5</td><td class="num">79.3%</td><td class="num">2.20</td><td class="num">9</td></tr>
+      <tr><td><code>transition_free</code></td><td class="num">119</td><td class="num">119</td><td class="num">0</td><td class="num">0</td><td class="num">63.9%</td><td class="num">2.17</td><td class="num">8</td></tr>
+      <tr><td><code>bare_free</code></td><td class="num">119</td><td class="num">119</td><td class="num">0</td><td class="num">0</td><td class="num">76.5%</td><td class="num">1.95</td><td class="num">7</td></tr>
+    </tbody>
+  </table>
+
+  <p>Banded <code>transition</code> put <strong>448 of 519 scores on exactly 9, and zero
+  on 10.</strong> That is not a scale in use; it is a default.</p>
+
+  <div class="note">
+    <p><strong>Modal fraction and SD disagree, and the disagreement is not cosmetic.</strong>
+    By modal fraction, <code>isolated</code> spreads widest — 34% against 79–86% for the
+    others. By SD, <code>bare</code> is widest at 2.20, just above isolated's 2.14. Bare's
+    SD is inflated by a long low tail sitting underneath a 79% pile-up at the top.</p>
+    <p>Any claim about which scorer "spreads more" has to name its metric. For TAPR's
+    purposes modal fraction is the more relevant one, because the problem being diagnosed
+    is a ceiling, not overall variance.</p>
+  </div>
+
+  <h3>The 0–1 scale changed nothing</h3>
+
+  <p>The unbanded judges genuinely emitted 0–1 values — <code>SCORE: 0.7</code>,
+  <code>SCORE: 0.5</code> — and the harness rescales by 10 on write so everything sits on
+  a common axis. But they used <strong>one decimal place only</strong>. The observed values
+  were 0, 0.2, 0.3, 0.5, 0.6, 0.7, 0.8, 0.9 and 1.0.</p>
+
+  <p>That is eleven available slots. A 0–10 integer scale is also eleven slots.
+  <strong>Effective resolution is identical.</strong> Two things follow:</p>
+
+  <ul>
+    <li>Comparing <code>isolated</code> on 0–10 against the free scorers on 0–1 is
+    <em>not</em> confounded by granularity. That comparison stands.</li>
+    <li>Whatever moved <code>transition</code> from 86% to 64% was <strong>not</strong>
+    the change of scale.</li>
+  </ul>
+</section>
+
+<!-- 7 -->
+<section id="confounds">
+  <p class="snum">07</p>
+  <h2 class="head">Confounds</h2>
+
+  <h3>The bands hypothesis is confounded five ways</h3>
+
+  <p>The main page reports that removing the bands lowered the pile-up from 86% to 64%.
+  That number is correct. The attribution is not yet established, because the banded and
+  unbanded transition prompts differ in five respects, not one:</p>
+
+  <ol class="body">
+    <li>Bands removed</li>
+    <li>Scale changed from 0–10 to 0–1</li>
+    <li><strong>The <code>NA</code> option removed</strong> — the free prompt has no
+    "not a transition" escape</li>
+    <li>The three explicit CHECK 1/2/3 steps collapsed into a bullet list</li>
+    <li>The skepticism instruction deleted — <em>"if unsure, score LOW. Do not resolve
+    doubt in favour of the move"</em></li>
+  </ol>
+
+  <p>The third is the most damaging. Banded <code>transition</code> returned
+  <code>NA</code> on <strong>64 of 586 calls, and on 24% of all step-0 calls</strong> —
+  concentrated on setup lines that restate the problem without inferring anything.
+  <code>transition_free</code> has no NA, so those steps are now scored, and setup lines
+  score high. That alone could account for the modal value moving to 10.</p>
+
+  <div class="flagbox">
+    <span class="tag pred">predicted</span> <strong>The bands hypothesis is untested — not
+    confirmed, and not refuted.</strong> Testing it needs a prompt that changes only the
+    bands, keeping the 0–10 scale, the NA option, the CHECK structure and the skepticism
+    line.
+  </div>
+
+  <p>The <code>bare</code> to <code>bare_free</code> pair is the clean comparison, because
+  only the scale changed there. It moved 79.3% to 76.5%, and SD <em>fell</em> from 2.20 to
+  1.95. On the only uncontaminated comparison available, the scale change did nothing and
+  may have tightened the distribution slightly. Caveat: 581 scores against 119, on
+  different traces.</p>
+
+  <h3>Different step populations</h3>
+
+  <p><code>transition</code>'s distribution is computed over 519 steps and
+  <code>isolated</code>'s over 586. They are not the same population of steps.</p>
+
+  <p>The direction of this favours the argument rather than undermining it: the 64
+  excluded steps are setup lines, which are exactly the steps that would have scored high.
+  Removing them should <em>lower</em> transition's pile-up, and it is still 86%. But a
+  reader who sees n=519 next to n=586 is entitled to know why, so it is stated here.</p>
+
+  <h3>Two scales, two different trace sets</h3>
+
+  <p>The banded scorers ran on 138 traces; the unbanded scorers ran on 30. No
+  banded-versus-unbanded number on the main page compares the same problems.</p>
+</section>
+
+<!-- 8 -->
+<section id="supports">
+  <p class="snum">08</p>
+  <h2 class="head">What the results support</h2>
+
+  <h3>The hypothesis failed</h3>
+
+  <p>Predicted: the transition judge catches broken reasoning much better than the
+  isolated judge, and produces more within-outcome variance. Shown: separation is
+  statistically indistinguishable across all three scorers, and within-outcome variance is
+  worse for transition than for isolated.</p>
+
+  <h3>What survives, stated precisely</h3>
+
+  <table>
+    <thead><tr><th>Claim</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>All three judges detect broken reasoning above chance</td><td><span class="tag">shown</span></td></tr>
+      <tr><td>The three scorers cannot be ranked at this sample size</td><td><span class="tag">shown</span></td></tr>
+      <tr><td>Explicit criteria add nothing over asking "does this follow?"</td><td><span class="tag">shown</span></td></tr>
+      <tr><td>LLM-as-judge is unreliable at 7B for this task</td><td><span class="tag">shown</span></td></tr>
+      <tr><td>Final-answer correctness mislabels ~36% of failures here</td><td><span class="tag">shown</span></td></tr>
+      <tr><td>The transition signal does not yet give a within-group gradient</td><td><span class="tag">shown</span></td></tr>
+      <tr><td>Bands caused the score collapse</td><td><span class="tag pred">predicted</span></td></tr>
+      <tr><td>Broken transitions are rare on GSM8K, so the ceiling is a task property</td><td><span class="tag pred">predicted</span></td></tr>
+      <tr><td>Context-aware scoring beats context-free scoring</td><td><span class="tag pred">predicted</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>The criteria result is worth reading positively</h3>
+
+  <p><code>bare</code> ties <code>transition</code> on separation. The obvious reading is
+  that TAPR's three conditions failed to earn their place. There is a second reading which
+  is stronger and which Harsh arrived at independently: if the judgment is baked into
+  criteria the researcher wrote, then human judgment has been <em>relocated</em> rather
+  than removed — the same critique he had made of policy-document approaches elsewhere. On
+  that reading, a criteria-free scorer matching a criteria-laden one is the result, not a
+  failure, and the surviving claim is the simpler one.</p>
+
+  <h3>The rarity reframe</h3>
+
+  <p><span class="tag pred">predicted</span> <code>isolated</code> has by far the smallest
+  pile-up at 34%, and it is banded. So bands cannot be the main driver. What separates it
+  from the other four is that it never sees the prior chain.</p>
+
+  <p>The proposed mechanism: given the full prior chain, most individual moves genuinely
+  do follow. Local coherence is the norm even in traces that end up wrong — which is the
+  premise of the whole project. So "does this follow?" is usually yes, and the judge says
+  10. <code>isolated</code> is asked a harder, narrower question — is this statement
+  well-formed on its own — which more steps fail.</p>
+
+  <p>If that is right, the ceiling is a property of the task rather than a defect in the
+  prompt: transition validity is a rare-failure signal, and the information lives in the
+  tail rather than the average. It would also explain the within-outcome result directly —
+  if roughly three quarters of steps score at the top, traces sharing an outcome get
+  identical minimums.</p>
+
+  <p>This is a hypothesis with a plausible mechanism and no decisive test behind it yet.
+  It should be read as the most interesting thing the experiment produced, and as the
+  thing most likely to be wrong.</p>
+</section>
+
+<!-- 9 -->
+<section id="limits">
+  <p class="snum">09</p>
+  <h2 class="head">Limitations</h2>
+
+  <ol class="body">
+    <li><strong>n = 27 broken traces.</strong> Too few to rank scorers. This is the
+    binding constraint on every comparative claim in the work.</li>
+    <li><strong>"Sound" means "not known broken."</strong> The 96 correct-answer traces
+    were never verified as having sound reasoning.</li>
+    <li><strong>The bands hypothesis is confounded five ways</strong> and untested.</li>
+    <li><strong>Banded and unbanded scorers ran on different trace sets</strong>, 138
+    against 30.</li>
+    <li><strong>Different step populations across scorers</strong>, 519 against 586, from
+    NA exclusion.</li>
+    <li><strong>One dataset, one generator, one judge family.</strong> GSM8K, a 3B
+    generator, a Qwen judge. Nothing here transfers without testing.</li>
+    <li><strong>Single judge run.</strong> Sampling is off so scores are deterministic,
+    but deterministic is not robust. No prompt-perturbation check was run.</li>
+    <li><strong>The confound argument is half-discharged.</strong> Checkpoint 1 validates
+    the signal alone. The mixing half of the argument needs a mixing comparison against a
+    signal already known to be sound, which does not exist yet.</li>
+  </ol>
+</section>
+
+<!-- 10 -->
+<section id="repro">
+  <p class="snum">10</p>
+  <h2 class="head">Reproducing this</h2>
+
+  <table>
+    <thead><tr><th>File</th><th>Judge</th><th>Traces</th><th>Scorers</th><th>Calls</th></tr></thead>
+    <tbody>
+      <tr><td><code>cal.jsonl</code></td><td>7B</td><td class="num">30</td><td>isolated, transition, bare</td><td class="num">357</td></tr>
+      <tr><td><code>cal14b.jsonl</code></td><td>14B</td><td class="num">30</td><td>isolated, transition, bare</td><td class="num">357</td></tr>
+      <tr><td><code>scores14b.jsonl</code></td><td>14B</td><td class="num">138</td><td>isolated, transition, bare</td><td class="num">1,758</td></tr>
+      <tr><td><code>cal_free.jsonl</code></td><td>14B</td><td class="num">30</td><td>transition_free, bare_free</td><td class="num">238</td></tr>
+    </tbody>
+  </table>
+
+  <p>Every row of every scores file keeps the judge's raw response, so any number above
+  can be traced back to the text that produced it. Nothing defaults on a parse failure —
+  a failed parse is recorded as a failure and counted, never silently filled with a
+  midpoint value.</p>
+
+  <p><code>traces.jsonl</code> should not be regenerated. Temperature is 0.9, so a rerun
+  produces different traces, and every result here is tied to this specific set.</p>
+
+  <div class="note">
+    <p><strong>Known bug.</strong> In <code>analyze_v2.py</code> the distribution section
+    was appended outside <code>main()</code> and never executes. It also assumes all five
+    scorers are present in the input. Use <code>check_spread.py</code> for distributions
+    until it is fixed.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Written by Claude at Harsh Raj's request, as a companion to
+  <a href="index.html">the main write-up</a>. Figures recomputed from raw output in
+  August 2026. Checkpoint 1 is inference only — no policy was trained, so nothing here is
+  a claim about downstream accuracy.</p>
+</footer>
+
+</div>
+</body>
+</html>
