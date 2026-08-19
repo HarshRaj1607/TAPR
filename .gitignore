@@ -13,14 +13,14 @@
 # adapter directly loadable:
 #   PeftModel.from_pretrained(base, "runs/gsm8k_tapr/adapter")
 
-runs/*/adapter/ref/
-runs/*/adapter/tokenizer.json
-runs/*/adapter/tokenizer_config.json
-runs/*/adapter/vocab.json
-runs/*/adapter/merges.txt
-runs/*/adapter/added_tokens.json
-runs/*/adapter/special_tokens_map.json
-runs/*/adapter/chat_template.jinja
+hackathon/runs/*/adapter/ref/
+hackathon/runs/*/adapter/tokenizer.json
+hackathon/runs/*/adapter/tokenizer_config.json
+hackathon/runs/*/adapter/vocab.json
+hackathon/runs/*/adapter/merges.txt
+hackathon/runs/*/adapter/added_tokens.json
+hackathon/runs/*/adapter/special_tokens_map.json
+hackathon/runs/*/adapter/chat_template.jinja
 
 # Training checkpoints — never committed, host large ones on HuggingFace
 checkpoints/
