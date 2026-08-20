@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TAPR Checkpoint 1 — Technical appendix</title>
+<title>TAPR Checkpoint 1, Technical appendix</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -172,8 +172,8 @@ footer{padding:40px 0 80px;font-size:14px;color:var(--muted)}
 
   <p>Checkpoint 1 removes all of it. <strong>No policy is trained.</strong> A fixed set
   of traces is scored by different scorers and the scores are compared. The only thing
-  that varies between conditions is the prompt given to the judge. Everything else — the
-  traces, the judge model, the decoding settings — is held identical.</p>
+  that varies between conditions is the prompt given to the judge. Everything else, the
+  traces, the judge model, the decoding settings, is held identical.</p>
 
   <p>The cost of this choice is that Checkpoint 1 cannot say anything about downstream
   accuracy. It is a measurement of the signal, not of what the signal does to a policy.</p>
@@ -202,14 +202,14 @@ footer{padding:40px 0 80px;font-size:14px;color:var(--muted)}
   <p><code>bare</code> is the control, and it is the most interesting design decision on
   the page. If a scorer given <em>no</em> criteria discriminates as well as one given three
   explicit conditions, then the explicit conditions add nothing over the model's own notion
-  of entailment. That converts a philosophical question — where does the judgment actually
-  live — into a measurement.</p>
+  of entailment. That converts a philosophical question, where does the judgment actually
+  live, into a measurement.</p>
 
   <h3>Prefix-only is structural, not instructed</h3>
 
   <p>A judge scoring step <em>i</em> is shown <code>steps[:i]</code>. The later steps are
   not passed to the model at all. This matters because a prompt that merely <em>asks</em>
-  a model to ignore what it can see is not a control — the information is still in context.
+  a model to ignore what it can see is not a control, the information is still in context.
   Here it is absent by construction.</p>
 </section>
 
@@ -364,7 +364,7 @@ SCORE: &lt;number between 0 and 1&gt;</pre>
     <p><strong>One design detail worth flagging.</strong> The reasoning is requested
     <em>before</em> the score in every prompt. An earlier version put <code>SCORE:</code>
     first because it was easier to parse. That produced a judge which emitted a number and
-    then wrote a justification for it — rationalisation, not reasoning. The ordering was
+    then wrote a justification for it, rationalisation, not reasoning. The ordering was
     reversed and the run was redone. This was an error in the harness design, and it cost
     a full scoring run.</p>
   </div>
@@ -427,7 +427,7 @@ SCORE: &lt;number between 0 and 1&gt;</pre>
 
   <p><strong>Qwen2.5-7B-Instruct</strong> scored 10 on 99% of steps. On a trace where the
   generator invented "7 days in a week" when the problem said <em>3 times a week</em>, the
-  7B judge described the value as commonly known and gave it 7/10 — and assigned a
+  7B judge described the value as commonly known and gave it 7/10, and assigned a
   <code>FABRICATED</code> bucket to a number that did not appear in the step at all.</p>
 
   <p><strong>Qwen2.5-14B-Instruct</strong> scored the same step <strong>0/10</strong>,
@@ -471,8 +471,7 @@ SCORE: &lt;number between 0 and 1&gt;</pre>
   <p>Every interval clears 50%, so all three judges do detect broken reasoning. Every
   interval also contains every other scorer's point estimate.
   <strong>At n = 27 broken traces the scorers cannot be ranked.</strong> Transition's
-  higher point estimate is not evidence that transition is better, and the main page is
-  correct not to claim otherwise.</p>
+  higher point estimate is not evidence that transition is better.</p>
 
   <h3>Within-outcome variance</h3>
 
@@ -520,7 +519,7 @@ SCORE: &lt;number between 0 and 1&gt;</pre>
 
   <div class="note">
     <p><strong>Modal fraction and SD disagree, and the disagreement is not cosmetic.</strong>
-    By modal fraction, <code>isolated</code> spreads widest — 34% against 79–86% for the
+    By modal fraction, <code>isolated</code> spreads widest, 34% against 79–86% for the
     others. By SD, <code>bare</code> is widest at 2.20, just above isolated's 2.14. Bare's
     SD is inflated by a long low tail sitting underneath a 79% pile-up at the top.</p>
     <p>Any claim about which scorer "spreads more" has to name its metric. For TAPR's
@@ -530,8 +529,8 @@ SCORE: &lt;number between 0 and 1&gt;</pre>
 
   <h3>The 0–1 scale changed nothing</h3>
 
-  <p>The unbanded judges genuinely emitted 0–1 values — <code>SCORE: 0.7</code>,
-  <code>SCORE: 0.5</code> — and the harness rescales by 10 on write so everything sits on
+  <p>The unbanded judges genuinely emitted 0–1 values, <code>SCORE: 0.7</code>,
+  <code>SCORE: 0.5</code>, and the harness rescales by 10 on write so everything sits on
   a common axis. But they used <strong>one decimal place only</strong>. The observed values
   were 0, 0.2, 0.3, 0.5, 0.6, 0.7, 0.8, 0.9 and 1.0.</p>
 
@@ -553,28 +552,28 @@ SCORE: &lt;number between 0 and 1&gt;</pre>
 
   <h3>The bands hypothesis is confounded five ways</h3>
 
-  <p>The main page reports that removing the bands lowered the pile-up from 86% to 64%.
-  That number is correct. The attribution is not yet established, because the banded and
-  unbanded transition prompts differ in five respects, not one:</p>
+  <p>Removing the bands lowered the pile-up from 86% to 64%. That number is correct. The
+  attribution is not, because the banded and unbanded transition prompts differ in five
+  respects, not one:</p>
 
   <ol class="body">
     <li>Bands removed</li>
     <li>Scale changed from 0–10 to 0–1</li>
-    <li><strong>The <code>NA</code> option removed</strong> — the free prompt has no
+    <li><strong>The <code>NA</code> option removed</strong>, the free prompt has no
     "not a transition" escape</li>
     <li>The three explicit CHECK 1/2/3 steps collapsed into a bullet list</li>
-    <li>The skepticism instruction deleted — <em>"if unsure, score LOW. Do not resolve
+    <li>The skepticism instruction deleted, <em>"if unsure, score LOW. Do not resolve
     doubt in favour of the move"</em></li>
   </ol>
 
   <p>The third is the most damaging. Banded <code>transition</code> returned
-  <code>NA</code> on <strong>64 of 586 calls, and on 24% of all step-0 calls</strong> —
+  <code>NA</code> on <strong>64 of 586 calls, and on 24% of all step-0 calls</strong> , 
   concentrated on setup lines that restate the problem without inferring anything.
   <code>transition_free</code> has no NA, so those steps are now scored, and setup lines
   score high. That alone could account for the modal value moving to 10.</p>
 
   <div class="flagbox">
-    <span class="tag pred">predicted</span> <strong>The bands hypothesis is untested — not
+    <span class="tag pred">predicted</span> <strong>The bands hypothesis is untested, not
     confirmed, and not refuted.</strong> Testing it needs a prompt that changes only the
     bands, keeping the 0–10 scale, the NA option, the CHECK structure and the skepticism
     line.
@@ -599,7 +598,7 @@ SCORE: &lt;number between 0 and 1&gt;</pre>
   <h3>Two scales, two different trace sets</h3>
 
   <p>The banded scorers ran on 138 traces; the unbanded scorers ran on 30. No
-  banded-versus-unbanded number on the main page compares the same problems.</p>
+  banded-versus-unbanded comparison here covers the same problems.</p>
 </section>
 
 <!-- 8 -->
@@ -637,7 +636,7 @@ SCORE: &lt;number between 0 and 1&gt;</pre>
   that TAPR's three conditions failed to earn their place. There is a second reading which
   is stronger and which Harsh arrived at independently: if the judgment is baked into
   criteria the researcher wrote, then human judgment has been <em>relocated</em> rather
-  than removed — the same critique he had made of policy-document approaches elsewhere. On
+  than removed, the same critique he had made of policy-document approaches elsewhere. On
   that reading, a criteria-free scorer matching a criteria-laden one is the result, not a
   failure, and the surviving claim is the simpler one.</p>
 
@@ -648,14 +647,14 @@ SCORE: &lt;number between 0 and 1&gt;</pre>
   from the other four is that it never sees the prior chain.</p>
 
   <p>The proposed mechanism: given the full prior chain, most individual moves genuinely
-  do follow. Local coherence is the norm even in traces that end up wrong — which is the
+  do follow. Local coherence is the norm even in traces that end up wrong, which is the
   premise of the whole project. So "does this follow?" is usually yes, and the judge says
-  10. <code>isolated</code> is asked a harder, narrower question — is this statement
-  well-formed on its own — which more steps fail.</p>
+  10. <code>isolated</code> is asked a harder, narrower question, is this statement
+  well-formed on its own, which more steps fail.</p>
 
   <p>If that is right, the ceiling is a property of the task rather than a defect in the
   prompt: transition validity is a rare-failure signal, and the information lives in the
-  tail rather than the average. It would also explain the within-outcome result directly —
+  tail rather than the average. It would also explain the within-outcome result directly , 
   if roughly three quarters of steps score at the top, traces sharing an outcome get
   identical minimums.</p>
 
@@ -705,7 +704,7 @@ SCORE: &lt;number between 0 and 1&gt;</pre>
   </table>
 
   <p>Every row of every scores file keeps the judge's raw response, so any number above
-  can be traced back to the text that produced it. Nothing defaults on a parse failure —
+  can be traced back to the text that produced it. Nothing defaults on a parse failure , 
   a failed parse is recorded as a failure and counted, never silently filled with a
   midpoint value.</p>
 
@@ -723,7 +722,7 @@ SCORE: &lt;number between 0 and 1&gt;</pre>
 <footer>
   <p>Written by Claude at Harsh Raj's request, as a companion to
   <a href="index.html">the main write-up</a>. Figures recomputed from raw output in
-  August 2026. Checkpoint 1 is inference only — no policy was trained, so nothing here is
+  August 2026. Checkpoint 1 is inference only, no policy was trained, so nothing here is
   a claim about downstream accuracy.</p>
 </footer>
 

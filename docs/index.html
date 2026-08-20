@@ -19,7 +19,6 @@
   --rule:#DCD8CE;
   --text:#23262B;
   --muted:#71757C;
-  --flag:#9A3B33;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -49,19 +48,13 @@ h1 em{font-style:italic;color:var(--ink-soft)}
   display:flex;flex-wrap:wrap;gap:8px 18px
 }
 
-/* ---------- voice legend ---------- */
-.legend{margin:34px 0 0;padding:22px 24px;border:1px solid var(--rule);background:#fff}
-.legend h2{
-  font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--muted);margin:0 0 14px;font-weight:500
+.topnav{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 24px}
+.btn{
+  font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.06em;
+  text-decoration:none;color:var(--ink);border:1px solid var(--graphite-rule);
+  padding:9px 15px;background:#fff;transition:border-color .15s,background .15s
 }
-.legend p{margin:0 0 12px;font-size:15.5px;line-height:1.6}
-.legend p:last-child{margin-bottom:0}
-.swatch{
-  display:inline-block;width:3px;height:.95em;vertical-align:-.12em;margin-right:9px;
-}
-.sw-ink{background:var(--ink)}
-.sw-ai{background:var(--graphite-rule)}
+.btn:hover{border-color:var(--ink);background:var(--ink-wash);color:var(--ink)}
 
 /* ---------- sections ---------- */
 section{padding:52px 0;border-bottom:1px solid var(--rule)}
@@ -125,10 +118,6 @@ figure{margin:26px 0}
 figure img{width:100%;display:block;border:1px solid var(--rule);background:#fff}
 figcaption{font-size:13.5px;color:var(--muted);margin-top:10px;line-height:1.5}
 
-.callout{
-  border-left:3px solid var(--flag);padding:4px 0 4px 18px;margin:22px 0;
-  font-size:16px;color:#3A2A28
-}
 code{
   font-family:"JetBrains Mono",monospace;font-size:.88em;
   background:var(--graphite-wash);padding:1px 5px
@@ -145,189 +134,277 @@ footer{padding:44px 0 80px;font-size:14px;color:var(--muted)}
   .voice{padding-left:18px}
   section{padding:40px 0}
 }
+
+/* ---------- decision blocks ---------- */
+.dec{
+  margin:0 0 22px;padding:18px 22px;
+  border:1px solid var(--rule);border-left:3px solid var(--ink-soft);background:#fff
+}
+.dlab{
+  font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-soft);margin:0 0 10px;font-weight:500
+}
+.dec p{margin:0 0 11px;font-size:15.5px}
+.dec p:last-child{margin-bottom:0}
+.cost{
+  font-size:14.5px;color:var(--graphite);
+  border-top:1px solid var(--rule);padding-top:10px;margin-top:12px
+}
+h3.sub{
+  font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);font-weight:500;
+  margin:32px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--rule)
+}
+
+.takeaway{
+  font-family:"Public Sans",system-ui,sans-serif;font-size:17px;font-weight:600;
+  line-height:1.45;color:var(--ink);margin:0 0 18px;padding:0 0 16px;
+  border-bottom:1px solid var(--rule)
+}
+.hyp{border-left:3px solid var(--ink);padding-left:16px}
+td.num{font-family:"JetBrains Mono",monospace;text-align:right;white-space:nowrap}
 </style>
 </head>
 <body>
 <div class="wrap">
-
 <header>
   <p class="eyebrow">TAPR · Checkpoint 1 · Aug 2026</p>
-  <h1>Before asking how to mix a process reward,<br><em>check whether the signal works at all</em></h1>
+  <h1>Transition Aware Process Reward</h1>
   <p class="standfirst">
-    An inference-only experiment on GSM8K reasoning traces, testing whether a judge
-    that scores transitions catches broken reasoning that a judge scoring steps in
-    isolation misses. It mostly did not, and the reasons turned out to be more
-    interesting than the result.
+    Going through the literature for this work, I noticed that the papers I read take the
+    PRM at face value. They never ask whether the signal it provides is good enough on its
+    own, and then they mix it with outcome rewards and report what happens.
+    <strong>So this work isolates the process signal, the isolated single step reward, and
+    compares it against a transition level reward of my own, before any mixing question is
+    asked.</strong>
   </p>
+
+  <div class="topnav">
+    <a class="btn" href="appendix.html">Technical appendix</a>
+    <a class="btn" href="https://github.com/HarshRaj1607/TAPR">Code &amp; data</a>
+  </div>
+
   <div class="byline">
     <span>Harsh Raj</span><span>Independent</span><span>Undergraduate, CSE</span>
   </div>
 
-  <div class="legend">
-    <h2>Two voices on this page</h2>
-    <p><span class="swatch sw-ink"></span><strong>Solid blue rule.</strong> Written by me,
-      from handwritten notes, in one pass. Not edited by a model. The gaps, the loose
-      phrasing and the places where I am unsure are left in on purpose. If you want to
-      know what I can actually do, read these parts.</p>
-    <p><span class="swatch sw-ai"></span><strong>Dashed grey rule.</strong> Written with
-      Claude's help. Numbers, tables, figures, and detail I asked it to fill in. It is
-      marked so you can tell the difference, and so the work does not look thinner than
-      it is.</p>
-  </div>
 </header>
 
-<!-- ============ 1 CLAIM ============ -->
+<!-- 01 -->
 <section>
   <div class="voice mine">
-    <p class="vlabel">My writing</p>
     <p class="snum">01</p>
     <h2 class="head">Claim</h2>
+
+    <p class="takeaway">Score the transition, not the step: given everything seen so far,
+    does this move follow?</p>
 
     <p>Outcome only reward is incapable of catching poor reasoning, since models have
     shown to produce the right output, probably from memory, despite poor reasoning, and
     vice versa, right reasoning and wrong outcome. The isolated step scorer scores steps
     in isolation, without context, so steps can be locally correct but lead to totally
-    poor reasoning overall. This is documented in multiple papers.</p>
+    poor reasoning overall. This is documented in multiple papers: <em>Reward Granularity
+    in RLVR</em> (2607.02869), <em>PROGRS</em> (2604.02341), <em>Samineni et al.</em>
+    (2510.18176).</p>
 
-    <p>What I found was that most papers don't separate whether the signal is weak vs
-    mixing the PRM signal with outcome reward conflicts.</p>
+    <p>So my idea was to first investigate the process reward itself, or think of a
+    better one. I came up with TAPR, Transition Aware Process Reward.</p>
 
     <p><strong>TAPR</strong> rewards the transition (simplification, conclusion,
     substitution, implication) based on its validity. Given everything we have seen so
     far in the reasoning trace, does the transition follow, is it valid?</p>
 
-    <p><strong>Hypothesis.</strong> The transition judge scorer catches poor reasoning
-    much better than the isolated judge, and within outcome variance is more in the
-    transition judge scores.</p>
-
-    <div class="insert">
-      <p class="vlabel">Added with Claude · the specific papers behind "most papers don't separate"</p>
-      <p style="margin-bottom:10px">Three papers document the failure of isolated step
-      scoring but none of them validate the signal on its own before studying how to
-      combine it:</p>
-      <ul style="margin-bottom:0">
-        <li><em>Reward Granularity in RLVR</em> (2607.02869). Process only supervision
-        gets the best accuracy (0.64) and the worst trace validity (0.22, below the
-        untrained base at 0.56). They vary the mixing weight and attribute the anomaly
-        at low process weight to conflicting optimization signals.</li>
-        <li><em>PROGRS</em> (2604.02341). States that PRMs assign high scores to locally
-        coherent reasoning that still ends in an incorrect answer, then builds machinery
-        (outcome conditioned centering) to constrain the signal rather than testing it.</li>
-        <li><em>Samineni et al.</em> (2510.18176). Finds RL improves local coherence
-        without correctness following, using an LLM error classifier that reaches 57.8%
-        accuracy against human annotation.</li>
-      </ul>
-    </div>
+    <p class="hyp"><strong>Hypothesis.</strong> The transition judge scorer catches poor
+    reasoning much better than the isolated judge, and within outcome variance is more in
+    the transition judge scores.</p>
   </div>
 </section>
 
-<!-- ============ 2 METHOD ============ -->
+<!-- 02 -->
 <section>
   <div class="voice mine">
-    <p class="vlabel">My writing</p>
     <p class="snum">02</p>
-    <h2 class="head">Methodology</h2>
+    <h2 class="head">Design decisions</h2>
 
-    <p>Qwen2.5-3B generates 5 traces per question, started with 30 questions, and our
-    scorers score those traces independently.</p>
+    <p class="takeaway">Eight calls that determine what this experiment measures. D5 and
+    D8 I now think were wrong. D2, the control that can invalidate my own contribution, I
+    borrowed after reading the <em>InterWhen</em> paper.</p>
 
-    <h3>Scorers</h3>
+    <div class="dec">
+      <p class="dlab">D1 · Inference only, no training</p>
+      <p>An earlier version trained the reward with GRPO. When that run underperformed,
+      the cause could have been the signal, the mixing weight, the KL penalty, the learning
+      rate or the seed. Nothing could be isolated, which is the same confound I am
+      accusing the literature of. So Checkpoint 1 trains nothing: the same fixed traces
+      are scored by different scorers and only the prompt changes.</p>
+      <p class="cost">This says nothing about downstream accuracy; it only measures the
+      signal itself.</p>
+    </div>
 
-    <p><strong>isolated judge.</strong> Sees the question and only one step, no other
-    content. Scores the step based only on mathematical validity.</p>
+    <div class="dec">
+      <p class="dlab">D2 · A control that can invalidate my own contribution, from <em>InterWhen</em></p>
+      <p>The idea to add the <code>bare</code> scorer came after reading the
+      <em>InterWhen</em> paper, where I realised that the real judgement, that is what
+      should be done vs avoided, what is the right next step, ie a reasoning step, a
+      transition, a tool call, must lie with the agent or judge itself. In InterWhen, when
+      the human writes the policy document, they are doing the real heavy lifting when it
+      comes to judgment and its quality, and not the agent.</p>
+      <p>The same objection applies to me. If I hand the judge my three conditions, the
+      judgment is still mine, relocated to me and not removed. <code>bare</code> tests
+      that: same context, no criteria, just "does this move follow from what came before?"
+      If it scores as well as the defined version, my definition was not doing the work.</p>
+      <p>A judge that holds its own notion of a valid transition, with no human supplying
+      one, is I feel actually the stronger version of the claim. What it would put pressure
+      on is the three conditions, not the idea of scoring transitions.</p>
+      <p class="cost">Pre-registered before any results were seen. Nothing here settles
+      whether <code>bare</code> beats <code>isolated</code>: the intervals overlap, so all
+      three scorers are currently indistinguishable.</p>
+    </div>
 
-    <p><strong>transition.</strong> Scores the transition based on validity: no
-    contradiction, value traceable, relevant, mathematically correct. We give the
-    definition of valid to the judge.</p>
+    <div class="dec">
+      <p class="dlab">D3 · Prefix only enforced in code, not by instruction</p>
+      <p>A judge scoring step <em>i</em> receives <code>steps[:i]</code>. Asking a model
+      to ignore text it can see is not a control, because the information is still in
+      context. Here it is absent by construction.</p>
+    </div>
 
-    <p>First we tried using a 0 to 10 scale with different bands, low band for poor
-    reasoning, middle band for reasoning that is valid but does not advance the problem.
-    Found the judge doesn't use the scale well and restricts itself to either a very low
-    or a very high score. Moved to a 0 to 1 scale with no described bands.</p>
+    <div class="dec">
+      <p class="dlab">D4 · 14B judge, not 7B</p>
+      <p>I started with the 7B Qwen as the judge, but found that it scored 10 out of 10 on
+      99% of the transitions. In one trace the model generated "7 days in a week" when the
+      problem said 3 times a week. The 7B judge treated it as a fact and scored it, even
+      though the underlying data in the problem said something else. It wrote "unsourced,
+      but commonly known" and gave it 7 out of 10. The 14B judge scored 0 out of 10 on the
+      same statement, correctly catching the contradiction, so I moved to 14B.</p>
+      <p class="cost">The diagnosis came from reading the judge's own text on a handful of
+      traces, not from a systematic sweep, so the direction is clear but the threshold is
+      not. The 7B calibration run, 30 traces and 357 calls, was discarded.</p>
+    </div>
 
-    <p><strong>bare.</strong> Scores the transition just like the previous judge, but we
-    leave the judgment of what is a valid transition to the judge and do not define it
-    ourselves. Scale: similar, first used 0 to 10, switched to 0 to 1.</p>
-
-    <p>The idea to add this new scorer came after reading the <em>interwhen</em> paper,
-    where I realised that the real judgement, that is what should be done vs avoided,
-    what is the right next step, ie a reasoning step, a transition, a tool call, must lie
-    with the agent or judge itself. In interwhen, when the human writes the policy
-    document, they are doing the real heavy lifting when it comes to judgment and its
-    quality, and not the agent.</p>
-
-    <div class="insert">
-      <p class="vlabel">Added with Claude · exact band values, and two design details</p>
+    <div class="dec">
+      <p class="dlab">D5 · Bands, then no bands</p>
       <p>The banded prompt used four bands: 0 to 3 when any premise contradicts the
       problem or is fabricated or the arithmetic is wrong, 4 to 6 when premises and
-      arithmetic are fine but the move does not advance the problem, 7 to 8 for valid
-      and advancing with minor issues, 9 to 10 when all three checks pass cleanly.</p>
-      <p>Two things that matter for reading the results. The prefix-only property is
-      enforced by slicing the trace in code, so a judge scoring step <em>i</em> is never
-      shown step <em>i</em> or later, rather than being asked politely not to look. And
-      the transition judge can return <code>NA</code> when a step restates the problem
-      instead of inferring anything, so setup lines do not count as perfect transitions.</p>
-      <p style="margin-bottom:0">The judge model is Qwen2.5-7B-Instruct, later
-      Qwen2.5-14B-Instruct, 4-bit quantized, run with sampling off so scores are
-      deterministic.</p>
+      arithmetic are fine but the move does not advance the problem, 7 to 8 for valid and
+      advancing with minor issues, 9 to 10 when all three checks pass cleanly. Found the
+      judge doesn't use the scale well and restricts itself to either a very low or a very
+      high score. Moved to a 0 to 1 scale with no described bands.</p>
+      <p class="cost"><strong>Wrong call.</strong> This change is confounded and I did not
+      notice at the time. Going
+      from banded to unbanded changed five things at once: the bands, the scale, the
+      <code>NA</code> option, the three explicit checks, and the instruction to score low
+      when unsure. The 86% to 64% shift cannot be attributed to bands.</p>
     </div>
+
+    <div class="dec">
+      <p class="dlab">D6 · The judge can refuse to score</p>
+      <p>The transition judge returns <code>NA</code> when a step restates the problem
+      instead of inferring anything, so setup lines do not count as perfect transitions.
+      It used this on 64 of 586 calls, and on 24% of all first steps.</p>
+      <p class="cost">This makes the distributions unequal: transition is measured over
+      519 steps and isolated over 586, so they are not the same population of steps. The
+      excluded steps are the ones that would have scored high, so removing them should
+      lower transition's pile-up, and it is still 86%.</p>
+    </div>
+
+    <div class="dec">
+      <p class="dlab">D7 · Lowest step score, not the average</p>
+      <p>Say the scorer notices one transition that is visibly wrong and gives it a low
+      score, but every transition after that is fine. The mean averages it out and makes
+      even the wrong trace look fine overall. The min catches that.</p>
+      <p class="cost">With most scores at the ceiling, a trace's score is decided by a
+      single step, which is also where judge noise is largest. Whether the within outcome
+      result is measuring reasoning or measuring which trace happened to get one step
+      marked down is not something this data can separate.</p>
+    </div>
+
+    <div class="dec">
+      <p class="dlab">D8 · Final answer as the ground truth</p>
+      <p>Traces were sorted into sound and broken by whether they reached the gold answer,
+      with format failures pulled out of the broken group. It is mechanical and it is
+      independent of every scorer, which is why I picked it: raw disagreement between two
+      scorers tells you nothing without an external arbiter.</p>
+      <p class="cost"><strong>This is the one that broke the experiment.</strong> The
+      final answer says the chain ended in the wrong place. It does not say where it went
+      wrong. My claim is specifically about traces where every step looks fine and the
+      chain still goes nowhere, and I never checked how many of the 27 have that shape.
+      Section 05 works through what this costs.</p>
+    </div>
+
+    <p><a href="appendix.html#prompts">Full prompt text for all five scorers</a>.</p>
   </div>
 </section>
 
-<!-- ============ 3 RESULT ============ -->
+<!-- 03 -->
 <section>
   <div class="voice mine">
-    <p class="vlabel">My writing</p>
     <p class="snum">03</p>
-    <h2 class="head">Result</h2>
+    <h2 class="head">What was run</h2>
 
-    <p>Total traces generated were 150, that is 30 questions by 5 traces per question.
-    Of those traces, 42 were wrong answer, but 15 of them, 36%, were format failures.
-    That is, the reasoning trace reached the correct final value, computed 70,000 in one
-    case, but wrote <code>#### 7.0</code> as the final answer.</p>
+    <p class="takeaway">36% of wrong answers here are format failures, not reasoning
+    failures. Labelling reasoning by final answer mislabels a third of them.</p>
 
-    <p>I started with the 7B Qwen as the judge, but found that it scored 10 out of 10 on
-    99% of the transitions. In one trace the model generated "7 days in a week" when the
-    problem said 3 times a week. The 7B judge wrote "unsourced, but commonly known" and
-    gave it 7 out of 10.</p>
+    <p>Qwen2.5-3B generates 5 traces per question, started with 30 questions, and the
+    scorers score those traces independently. Judge is Qwen2.5-14B-Instruct, 4-bit
+    quantized, sampling off so scores are deterministic. 586 steps, 1,758 judge calls.</p>
 
-    <p>Therefore I switched to the 14B judge, which scored 0 out of 10 on the same 7 days
-    a week statement, correctly identifying the wrong reasoning. So I went ahead with the
-    14B judge.</p>
+    <pre>150   generated
+ -12  unparseable, no steps or no #### marker
+────
+138   scored
+       ├─  96  correct final answer
+       └─  42  wrong final answer
+                ├─ 15  format failures
+                └─ 27  genuinely broken reasoning
+────
+123   in the separation analysis, 96 sound and 27 broken</pre>
+
+    <p>Of the 42 wrong answer traces, 15, that is 36%, were format failures. That is, the
+    reasoning trace reached the correct final value, computed 70,000 in one case, but
+    wrote <code>#### 7.0</code> as the final answer. Any work that labels reasoning
+    quality by final answer correctness on this setup mislabels a third of its
+    failures.</p>
+
   </div>
+</section>
 
-  <div class="voice ai" style="margin-top:34px">
-    <p class="vlabel">Written with Claude · the numbers</p>
+<!-- 04 -->
+<section>
+  <div class="voice mine">
+    <p class="snum">04</p>
+    <h2 class="head">Results</h2>
 
-    <div class="ai-note">
-      <strong>What the table shows.</strong> Separation is the probability that a
-      randomly chosen sound trace scores above a randomly chosen broken trace. 50% is
-      chance. Each trace is summarised by its lowest step score, on the view that one
-      broken link breaks a chain. Format failures are removed from the broken group,
-      leaving 96 sound and 27 broken traces. Intervals are bootstrap 95%.
-    </div>
+    <p class="takeaway">All three scorers beat chance and none can be ranked. Within
+    outcome spread, the metric that matters for training, went the wrong way.</p>
+
+    <h3 class="sub">Separation</h3>
+
+    <p>Separation is the probability that a randomly chosen sound trace scores above a
+    randomly chosen broken trace. 50% is chance. Format failures are removed from the
+    broken group, leaving 96 sound and 27 broken. Intervals are bootstrap 95%.</p>
 
     <table>
-      <thead>
-        <tr><th>Scorer</th><th>Sound</th><th>Broken</th><th>Gap</th><th>Separation</th><th>95% CI</th></tr>
-      </thead>
+      <thead><tr><th>Scorer</th><th>Sound</th><th>Broken</th><th>Gap</th><th>Separation</th><th>95% CI</th></tr></thead>
       <tbody>
         <tr><td>isolated</td><td class="num">6.72</td><td class="num">4.30</td><td class="num">2.42</td><td class="num">71.8%</td><td class="num">58.6 – 84.2</td></tr>
-        <tr class="hi"><td>transition</td><td class="num">8.18</td><td class="num">4.60</td><td class="num">3.58</td><td class="num">76.1%</td><td class="num">64.2 – 86.9</td></tr>
+        <tr><td>transition</td><td class="num">8.18</td><td class="num">4.60</td><td class="num">3.58</td><td class="num">76.1%</td><td class="num">64.2 – 86.9</td></tr>
         <tr><td>bare</td><td class="num">8.50</td><td class="num">5.70</td><td class="num">2.80</td><td class="num">75.3%</td><td class="num">65.3 – 85.0</td></tr>
       </tbody>
     </table>
 
+    <p>Every interval clears chance. Every interval also contains every other scorer's
+    point estimate, so at this sample size the scorers cannot be ranked.</p>
+
     <figure>
-      <img src="fig/fig_separation.png" alt="Separation with 95% confidence intervals for the three scorers, all overlapping">
-      <figcaption>Every interval clears chance. Every interval also contains every other
-      scorer's point estimate.</figcaption>
+      <img src="fig/fig_separation.png" alt="Separation with bootstrap confidence intervals for three scorers, all above chance and all overlapping">
     </figure>
 
-    <h3>Within outcome spread</h3>
+    <h3 class="sub">Within outcome spread</h3>
+
     <p>Traces of the same problem that reached the same final answer. If their scores are
     identical, the signal adds nothing over the outcome reward, because a group with zero
-    reward variance produces zero advantage under GRPO and teaches the policy nothing.</p>
+    reward variance produces zero advantage under GRPO and teaches the policy nothing.
+    This is the metric that matters most for the eventual training application.</p>
 
     <table>
       <thead><tr><th>Scorer</th><th>Groups</th><th>Mean SD</th><th>Zero variance</th></tr></thead>
@@ -338,68 +415,116 @@ footer{padding:44px 0 80px;font-size:14px;color:var(--muted)}
       </tbody>
     </table>
 
-    <h3>How the judges used the scale</h3>
+    <p>The prediction was that transition would produce more spread than isolated. It
+    produced less.</p>
+
+    <h3 class="sub">How the judges used the scale</h3>
+
+    <table>
+      <thead><tr><th>Scorer</th><th>Scale</th><th>Scored</th><th>NA</th><th>Modal</th><th>SD</th><th>Distinct</th></tr></thead>
+      <tbody>
+        <tr><td>isolated</td><td>0 to 10, banded</td><td class="num">586</td><td class="num">0</td><td class="num">34.3%</td><td class="num">2.14</td><td class="num">10</td></tr>
+        <tr><td>transition</td><td>0 to 10, banded</td><td class="num">519</td><td class="num">64</td><td class="num">86.3%</td><td class="num">1.77</td><td class="num">8</td></tr>
+        <tr><td>bare</td><td>0 to 10, no criteria</td><td class="num">581</td><td class="num">0</td><td class="num">79.3%</td><td class="num">2.20</td><td class="num">9</td></tr>
+        <tr><td>transition_free</td><td>0 to 1, unbanded</td><td class="num">119</td><td class="num">0</td><td class="num">63.9%</td><td class="num">2.17</td><td class="num">8</td></tr>
+        <tr><td>bare_free</td><td>0 to 1, no criteria</td><td class="num">119</td><td class="num">0</td><td class="num">76.5%</td><td class="num">1.95</td><td class="num">7</td></tr>
+      </tbody>
+    </table>
+
     <figure>
-      <img src="fig/fig_distributions.png" alt="Score distributions for five scorers, showing every context-aware scorer piling up at a single value">
-      <figcaption>The banded transition judge put 448 of 519 scores on exactly 9 and
-      never once used 10. Removing the bands and moving to a 0 to 1 scale lowered the
-      pile-up from 86% to 64% but did not remove it. The isolated judge, which is also
-      banded, has the widest spread of all five.</figcaption>
+      <img src="fig/fig_distributions.png" alt="Score distributions for three scorers on both scales, showing every context-aware scorer piling up at the top">
+      <figcaption>Banded transition put 448 of 519 scores on exactly 9 and never used 10.
+      Dropping the bands moved the pile-up to 10 and lowered it from 86% to 64%, but did
+      not remove it. Bare, which never had bands, moved only from 79% to 76%. The isolated
+      judge is banded too and has the smallest pile-up of any scorer, 34%. That is the
+      modal fraction; by standard deviation, bare is the widest.</figcaption>
     </figure>
+
+    <p>The two scales never ran on the same traces. The banded scorers covered 138 traces
+    and the unbanded scorers covered 30, so no banded against unbanded number here
+    compares the same problems.</p>
   </div>
 </section>
 
-<!-- ============ 4 INTERPRETATION ============ -->
+<!-- 05 -->
 <section>
   <div class="voice mine">
-    <p class="vlabel">My writing</p>
-    <p class="snum">04</p>
+    <p class="snum">05</p>
     <h2 class="head">Interpretation</h2>
 
-    <p>The CIs overlap. At n = 27 broken traces it is not feasible to rank the scorers.
-    However each judge performs better than pure chance.</p>
+    <p class="takeaway">The hypothesis failed, but the null does not mean the signal is
+    weak. I selected the broken group by final answer, and my claim is about structure.
+    The test ran on the wrong traces.</p>
 
-    <p>Because of the previously mentioned scale, 0 to 10, and band problem, the within
-    outcome variance also didn't go our way, since our transition judge never used the
-    scale properly.</p>
+    <p>At n = 27 broken traces the CIs overlap and the scorers cannot be ranked, though
+    each beats chance. Within outcome variance went the other way from the prediction.</p>
 
-    <p>The fix was to use a 0 to 1 scale instead, with no bands. This was only tested on
-    30 traces as of now.</p>
+    <p>The bigger problem is D8, what went into the broken group. My claim is about
+    traces where every step looks fine on its own but the chain still goes nowhere. That
+    is the only shape where a transition judge can beat an isolated one, because a step
+    that is wrong by itself gets caught either way. A trace lands in my broken group
+    whether it did bad arithmetic in step 2 or drifted coherently across five steps.</p>
+
+    <p>If most of them break at a single visible step, both judges catch them and the
+    scores come out close, which is what happened. This was a null result but on the wrong
+    population of traces, so I feel I need to measure a different bucket of traces. The
+    runs are correct and the numbers are sound, but the problem sits earlier, in which
+    traces went in, chosen by the wrong criterion.</p>
+
+    <p>The same error runs the other way in the sound group. Those 96 traces reached the
+    correct answer and were never checked, so some got there by a wrong route. That is
+    exactly what the 15 format failures show, in reverse.</p>
 
     <div class="insert">
-      <p class="vlabel">Added with Claude · where that explanation runs out</p>
-      <p>Stated as a hypothesis rather than a cause, because the evidence only partly
-      supports it. Removing the bands raised the spread, 86% down to 64% on the modal
-      value, so the bands were doing something. But the pile-up did not go away, and the
-      unbanded test ran on 30 traces while the banded run used 138, so the comparison is
-      across different problems and not a clean substitution.</p>
-      <p style="margin-bottom:0">The stronger objection is that the isolated judge is
-      also banded and has the widest spread of any scorer. So bands cannot be the whole
-      story. What separates isolated from the rest is that it never sees the prior chain.
-      That suggests a different reading: given the full chain, most individual moves
-      genuinely do follow, so a judge asked "does this follow" answers yes almost always.
-      If that is right, broken transitions are a rare event on GSM8K and the ceiling is a
-      property of the task rather than a defect in the prompt.</p>
+      <p>The scale problem doesn't explain it either. Removing the bands raised
+      the spread, 86% down to 64% on the modal value, so something in that change was
+      doing work. But the pile-up did not go away, the change touched five things at once,
+      and the unbanded test ran on 30 traces while the banded run used 138.</p>
+      <p>The stronger objection is that the isolated judge is also banded and has the
+      widest spread of any scorer, so bands cannot be the whole story. What separates
+      isolated from the rest is that it never sees the prior chain. That suggests a
+      different reading: given the full chain, most individual moves genuinely do follow,
+      so a judge asked "does this follow" answers yes almost always. If that is right,
+      broken transitions are a rare event on GSM8K and the ceiling is a property of the
+      task rather than a defect in the prompt.</p>
     </div>
+
+    <p>Both readings, the rare event one and the wrong population one, predict the same
+    thing: the information is concentrated in a small number of traces I have not
+    identified. That is what the next step goes after.</p>
   </div>
 </section>
 
-<!-- ============ 5 WHAT NEXT ============ -->
-<section>
-  <div class="voice ai">
-    <p class="vlabel">Written with Claude · from decisions I made during the work</p>
-    <p class="snum">05</p>
+<!-- 06 -->
+<section id="next">
+  <div class="voice mine">
+    <p class="snum">06</p>
     <h2 class="head">What I would try next</h2>
 
-    <p><strong>More dimensions in the validity definition.</strong> The current
-    definition has three parts and most steps satisfy all three, which is part of why the
-    scores bunch at the top. A finer definition would give the judge somewhere to put a
-    step that is valid but weak, and that headroom is what within outcome variance needs.</p>
+    <p class="takeaway">Label the traces by hand and split the broken ones by where they
+    break. Nothing else is worth running until that is done.</p>
 
-    <p><strong>Accept that broken transitions are rare, at least on GSM8K.</strong> If
-    most moves are fine, the information sits in the tail rather than in the average.
-    That points at counting failures instead of averaging scores, and at picking a harder
-    dataset where local breaks are more common.</p>
+    <p>Reading the steps is the only source of step level truth that is not the judge I am
+    trying to evaluate. Every trace goes into one of three groups: sound, broken with an
+    identifiable bad step, and broken with no bad step but going nowhere anyway. Then
+    separation is computed twice, each broken group against the sound group.</p>
+
+    <p>The prediction that follows from the claim: on the first broken group the two
+    judges perform similarly, because a locally visible error is visible either way. On
+    the second, transition beats isolated. If both groups look the same, TAPR is dead.</p>
+
+    <p>Labelling also gives two things the experiment currently assumes: judge accuracy
+    measured against labels rather than resting on the 7 days in a week anecdote, and a
+    count of how many of the 96 sound traces got there by a wrong route.</p>
+
+    <p><strong>More dimensions in the validity definition.</strong> The current definition
+    has three parts and most steps satisfy all three, which is part of why the scores
+    bunch at the top. A finer definition would give the judge somewhere to put a step that
+    is valid but weak, and that headroom is what within outcome variance needs.</p>
+
+    <p><strong>Deconfound the band test.</strong> Change only the bands, keeping the 0 to
+    10 scale, the <code>NA</code> option, the three checks and the instruction to score
+    low when unsure. Until that runs, nothing can be said about bands.</p>
 
     <p><strong>More questions.</strong> Everything here rests on 27 genuinely broken
     traces. At the observed rate of roughly 30% wrong answers, of which about two thirds
@@ -408,90 +533,62 @@ footer{padding:44px 0 80px;font-size:14px;color:var(--muted)}
 
     <p><strong>Run the unbanded scorers on the full set.</strong> The 0 to 1 result is
     from 30 traces and cannot be compared directly with the 138 trace banded run.</p>
+
+    <p><strong>The perturbation idea.</strong> Everything above still
+    rests on a 14B model's opinion, and the only evidence that opinion is any good is the
+    one 7 days in a week trace. I cannot validate the judge with the judge. One way out is
+    to edit a prior step, delete everything after it, regenerate, and see whether the next
+    step changes. A step that was genuinely derived from its context should break when its
+    context breaks, and no judge is asked anything.</p>
+
+    <p>What stops this from being straightforward is that changing a value and changing
+    surface form both move the output. If I rewrite white = 1 to white = 4 and the next
+    step changes, the model might be reading the premise, or it might be adding whichever
+    number it saw last. Separating those needs a second kind of edit, one that changes the
+    wording or the ordering while leaving the arithmetic alone, and I do not yet know
+    whether that separation holds at the level of a single step.</p>
   </div>
 </section>
 
-<!-- ============ 6 COLLABORATION ============ -->
+<!-- 07 -->
 <section>
-  <div class="voice ai">
-    <p class="vlabel">Written with Claude · my account of the process</p>
-    <p class="snum">06</p>
-    <h2 class="head">How I worked with Claude</h2>
-
-    <p>I used an attempt first rule. Reading the literature, forming the hypothesis,
-    writing the claim, designing the experiment, writing code, interpreting results: I
-    tried each part myself before showing it to a model. Only after I had attempted
-    something a few times and hit a threshold did I hand it over. The threshold was
-    usually one of: days without progress, not knowing what to do next, not being able to
-    write a piece of code or read a result, or being too tired to keep attacking it
-    alone.</p>
-
-    <p>Then I would put my attempt in front of Claude to be critiqued, take the critique
-    back, and sharpen it myself. After a few rounds of that, I was often the one catching
-    Claude's mistakes rather than the other way round.</p>
-
-    <div class="ai-note">
-      <strong>Claude's note on that last sentence.</strong> It splits by type rather than
-      by count. Harsh caught the conceptual and design errors: that asking the judge for a
-      score before its reasoning produced confident rationalisation after the fact, that
-      "wrong final answer" does not mean "broken reasoning", that the real failure in the
-      7 days a week case was contradiction rather than an unsourced value, and that a
-      scorer with no stated criteria matching one with criteria was the result rather than
-      a failure. Claude caught the technical and statistical ones: parsing crashes,
-      truncated traces, that the confidence intervals overlapped when only point estimates
-      had been looked at, and that format failures had never been excluded from any
-      analysis. So Harsh was more reliable about what the work should be, Claude about
-      whether the machinery was sound.
-    </div>
-
-    <p>What did not get delegated was the conceptual layer. Every decision that changed
-    what this experiment measures, the claim, the prompts, the scoring rules, what counts
-    as a broken trace, and what would count as failure, was written before a model saw
-    it.</p>
-  </div>
-</section>
-
-<!-- ============ 7 PRIMER ============ -->
-<section>
-  <div class="voice ai">
-    <p class="vlabel">Written with Claude · earlier work this builds on</p>
+  <div class="voice mine">
     <p class="snum">07</p>
     <h2 class="head">Where this came from</h2>
 
-    <p>An earlier version of TAPR was built during a hackathon and trained the reward
-    rather than validating it. Qwen2.5-3B was fine tuned with GRPO on GSM8K using a live
-    7B judge, with a transition reward mixed into the outcome reward.</p>
+    <p class="takeaway">An earlier version trained the reward instead of validating it,
+    and could not tell whether the signal was any good. That is why this checkpoint
+    exists.</p>
 
-    <p>The one clean result was mechanical. Outcome only training left about half of all
-    problem groups with zero reward variance, which means zero advantage and no learning
-    signal from those problems. Adding the transition reward drove that to near zero on
-    both datasets tested. The accuracy results were weaker: in-domain GSM8K accuracy moved
-    by less than half a point, and a cross-task gap on StrategyQA came from a single seed
-    with a confidence interval that includes zero.</p>
+    <p>Built during a hackathon: Qwen2.5-3B fine tuned with GRPO on GSM8K using a live 7B
+    judge, transition reward mixed into the outcome reward. The one clean result was
+    mechanical. Outcome only training left about half of all problem groups with zero
+    reward variance, and adding the transition reward drove that to near zero on both
+    datasets. The accuracy results were weaker: in-domain GSM8K moved by less than half a
+    point, and a cross-task gap on StrategyQA came from a single seed with a confidence
+    interval that includes zero.</p>
 
-    <p>That is why this checkpoint exists. The training run could not tell whether the
-    signal was any good, only that adding something dense changed the optimization. The
-    write-up of that earlier work, with the results marked by how much they can be
-    trusted, is <a href="https://github.com/HarshRaj1607/TAPR/tree/main/hackathon">here</a>.</p>
+    <p>All it showed was that adding something dense changed the optimization. That work
+    is <a href="https://github.com/HarshRaj1607/TAPR">in the repository</a>.</p>
   </div>
 </section>
 
-<!-- ============ PENDING ============ -->
-<section>
+<!-- 08 -->
+<section id="code">
   <div class="voice mine">
     <p class="snum">08</p>
     <h2 class="head">Still to come</h2>
     <div class="pending">
-      [ pending ] Holes in this work, written by me after using Claude as an adversary<br>
-      [ pending ] Link to code and data
+      [ pending ] Holes in this work, written after arguing against it deliberately
     </div>
   </div>
 </section>
 
 <footer>
   <p>Checkpoint 1 is inference only. No policy was trained, so nothing here is a claim
-  about downstream accuracy. Every number on this page comes from a single scoring run
-  with sampling disabled.</p>
+  about downstream accuracy. Sampling was disabled for every judge call, so scores are
+  deterministic. The 0 to 10 results come from the full set of traces; the 0 to 1 results
+  come from a smaller subset run separately, so the two are not directly comparable.</p>
 </footer>
 
 </div>
