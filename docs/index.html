@@ -122,10 +122,6 @@ code{
   font-family:"JetBrains Mono",monospace;font-size:.88em;
   background:var(--graphite-wash);padding:1px 5px
 }
-.pending{
-  border:1px dashed var(--graphite-rule);padding:18px 20px;margin:20px 0;
-  font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--muted)
-}
 a{color:var(--ink-soft);text-decoration:underline;text-underline-offset:2px}
 a:hover{color:var(--ink)}
 footer{padding:44px 0 80px;font-size:14px;color:var(--muted)}
@@ -227,8 +223,8 @@ td.num{font-family:"JetBrains Mono",monospace;text-align:right;white-space:nowra
     <h2 class="head">Design decisions</h2>
 
     <p class="takeaway">Eight calls that determine what this experiment measures. D5 and
-    D8 I now think were wrong. D2, the control that can invalidate my own contribution, I
-    borrowed after reading the <em>InterWhen</em> paper.</p>
+    D8 I now think were wrong. D2, the control with no criteria, I borrowed after reading
+    the <em>InterWhen</em> paper.</p>
 
     <div class="dec">
       <p class="dlab">D1 · Inference only, no training</p>
@@ -242,7 +238,7 @@ td.num{font-family:"JetBrains Mono",monospace;text-align:right;white-space:nowra
     </div>
 
     <div class="dec">
-      <p class="dlab">D2 · A control that can invalidate my own contribution, from <em>InterWhen</em></p>
+      <p class="dlab">D2 · A control with no criteria, from <em>InterWhen</em></p>
       <p>The idea to add the <code>bare</code> scorer came after reading the
       <em>InterWhen</em> paper, where I realised that the real judgement, that is what
       should be done vs avoided, what is the right next step, ie a reasoning step, a
@@ -570,17 +566,6 @@ td.num{font-family:"JetBrains Mono",monospace;text-align:right;white-space:nowra
 
     <p>All it showed was that adding something dense changed the optimization. That work
     is <a href="https://github.com/HarshRaj1607/TAPR">in the repository</a>.</p>
-  </div>
-</section>
-
-<!-- 08 -->
-<section id="code">
-  <div class="voice mine">
-    <p class="snum">08</p>
-    <h2 class="head">Still to come</h2>
-    <div class="pending">
-      [ pending ] Holes in this work, written after arguing against it deliberately
-    </div>
   </div>
 </section>
 
