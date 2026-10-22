@@ -77,9 +77,10 @@ Outcome-only GRPO on GSM8K *damaged* the model's general reasoning — 5.5pp bel
 |---|---|---|---|---|
 | GSM8K (n=1319) | 72.86% | 77.03% | 77.26% | +0.23pp |
 | StrategyQA (n=200) | 61.00% | 62.50% | 63.50% | +1.00pp |
-| MATH-500 (n=200) | 47.00% | ~47% | ~47% | ~0pp |
 
-**These in-domain gaps are not claimable improvements.** +0.23pp on GSM8K is three additional correct answers out of 1319 — noise. +1.00pp on StrategyQA sits well inside the 3.4pp standard error at n=200. MATH-500 is a clean null result: GSM8K training does not transfer to competition math, which usefully bounds the transfer effect.
+**These in-domain gaps are not claimable improvements.** +0.23pp on GSM8K is three additional correct answers out of 1319 — noise. +1.00pp on StrategyQA sits well inside the 3.4pp standard error at n=200.
+
+**MATH-500 is dropped from the claims.** Two of its figures were recorded approximately and never re-run, so nothing here relies on them. The earlier "null result" reading is retained only in `results/math500/` and `docs/RESEARCH_RECORD.md` for the record.
 
 A cautionary note worth recording: at n=200, the GSM8K TAPR-vs-ORM gap read as **3.0pp**. At the full 1319 problems it collapsed to **0.23pp**. Small-sample RL evaluation is unstable.
 
@@ -215,7 +216,7 @@ python src/eval.py --model tapr \
 - **3B student, 400 steps.** KL stayed at 0.001–0.004 throughout — the policy barely moved. This is enough to demonstrate the mechanism, not enough to demonstrate accuracy gains.
 - **Single seed everywhere.** The 4.5pp cross-task result could be noise until replicated.
 - **StrategyQA has no labeled test set.** Evaluation uses a held-out 10% of the train split. Both runs share `RANDOM_SEED=42`, so the eval sets are identical across conditions.
-- **n=200 for StrategyQA and MATH-500.** Standard error ≈ 3.4pp.
+- **n=200 for StrategyQA.** Standard error ≈ 3.4pp.
 - **λ=0.3 was tuned qualitatively during early exploration**, never formally ablated at full training scale.
 - **The transfer mechanism is a hypothesis.** Two explanations remain live: TAPR as implicit regularizer (moves the policy less) versus TAPR as different learning (moves it comparably but in a different direction). The policy drift experiment is designed to distinguish them.
 

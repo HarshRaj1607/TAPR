@@ -54,8 +54,15 @@ Other findings that stand on their own:
 - **36% of wrong-answer traces are format failures**, not reasoning failures.
   Labelling reasoning quality by final-answer correctness mislabels a third of
   failures on this setup.
-- **LLM-as-judge is unreliable at 7B** for transition validity. Qwen2.5-7B scored
-  10 on 99% of steps and fabricated its own justifications. 14B works.
+- **The 7B judge missed a fabricated value that the 14B caught.** On a step where
+  the generator invented "7 days/week" (the problem says 3 times a week), Qwen2.5-7B
+  scored 7/10 and Qwen2.5-14B scored 0/10. This is one traced example, and the
+  30-trace calibration set has only 3 wrong-answer traces, so it is an anecdote,
+  not a measured judge-accuracy gap. An earlier note that 7B scored 10 on 99% of
+  steps could not be reproduced from the retained `cal.jsonl` (banded prompt:
+  9% of transition scores and 85% of bare scores are 10); it likely came from an
+  earlier prompt version that was not kept. Judge accuracy against hand labels is
+  still to be measured.
 - **`bare` ties `transition`.** Explicit criteria added nothing over asking "does
   this follow?"
 

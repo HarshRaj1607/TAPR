@@ -424,7 +424,10 @@ SCORE: &lt;number between 0 and 1&gt;</pre>
   <p>Both judges 4-bit quantized (nf4, double quant), <code>do_sample=False</code>, so
   scores are deterministic.</p>
 
-  <p><strong>Qwen2.5-7B-Instruct</strong> scored 10 on 99% of steps. On a trace where the
+  <p><strong>Qwen2.5-7B-Instruct</strong> was found to give very high scores in early
+  calibration (an earlier note said 10 on 99% of steps; that figure could not be
+  reproduced from the retained banded-prompt file, where 9% of transition and 85%
+  of bare scores are 10). On a trace where the
   generator invented "7 days in a week" when the problem said <em>3 times a week</em>, the
   7B judge described the value as commonly known and gave it 7/10, and assigned a
   <code>FABRICATED</code> bucket to a number that did not appear in the step at all.</p>
