@@ -3,18 +3,14 @@
 | File | Judge | Traces | Scorers | Calls | Status |
 |---|---|---|---|---|---|
 | `traces.jsonl` | — | 150 generated | — | — | committed |
-| `cal.jsonl` | Qwen2.5-7B-Instruct | 30 | isolated, transition, bare | 357 | **missing** |
-| `cal14b.jsonl` | Qwen2.5-14B-Instruct | 30 | isolated, transition, bare | 357 | **missing** |
+| `cal.jsonl` | Qwen2.5-7B-Instruct | 30 | isolated, transition, bare | 357 | committed (recovered from Drive, Oct 2026) |
+| `cal14b.jsonl` | Qwen2.5-14B-Instruct | 30 | isolated, transition, bare | 357 | committed (recovered from Drive, Oct 2026) |
 | `scores14b.jsonl` | Qwen2.5-14B-Instruct | 138 | isolated, transition, bare | 1,758 | committed |
 | `cal_free.jsonl` | Qwen2.5-14B-Instruct | 30 | transition_free, bare_free | 238 | committed |
 
-**`cal.jsonl` and `cal14b.jsonl` are not in this folder.** They're referenced
-in the appendix write-up (the 7B-vs-14B judge comparison) but weren't found on
-disk during this pass. If they exist elsewhere — another machine, a Colab
-runtime, a different local folder — add them here before relying on the
-appendix's judge-comparison claims being independently re-checkable. Everything
-below describes all five files as originally recorded; only three are
-currently present.
+`cal.jsonl` and `cal14b.jsonl` were recovered from Google Drive and verified
+against the originals (byte sizes match, 357 rows each, 30 traces each). All
+five files are now present.
 
 ## Row schema — traces.jsonl
 

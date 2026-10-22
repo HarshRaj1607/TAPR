@@ -105,8 +105,6 @@ and counted, never silently filled with a midpoint.
 
 ## Known issues
 
-- `analyze_v2.py`: the distribution section sits outside `main()` and never runs.
-  It also assumes all five scorers are present. Use `check_spread.py` meanwhile.
 - The banded-vs-unbanded comparison changes five things at once, not one — see
   the appendix. The bands hypothesis is untested, not confirmed.
 - Banded scorers ran on 138 traces, unbanded on 30. Not the same problems.
