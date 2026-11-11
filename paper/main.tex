@@ -1,0 +1,97 @@
+\documentclass[11pt]{article}
+
+% review = anonymous submission build. Switch to "final" for camera-ready.
+\usepackage[review]{acl}
+
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+% \usepackage{inconsolata}  % optional typewriter font; enable on Overleaf
+\usepackage{graphicx}
+\usepackage{booktabs}
+
+\title{TODO: Title (state the finding, not the method name)}
+
+% Anonymous for review. Do not put names, affiliations, or a non-anonymized repo link here.
+\author{Anonymous EACL submission}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+TODO (write last). Three sentences: the problem, what you found, why it matters.
+\end{abstract}
+
+\section{Introduction}
+% TODO (yours): the problem in your own words.
+% Must contain: why outcome-only reward is a weak signal for multi-step reasoning;
+% what TAPR does; the 3 to 4 concrete contributions, each backed by a table or figure below.
+
+\section{Related Work}
+% TODO (yours): process reward models, outcome vs process supervision, GRPO,
+% LLM-as-judge for reasoning steps. Cite only papers you have opened.
+% PROGRS and the neighbouring work from your notes go here.
+
+\section{Method}
+% TODO: TAPR reward definition, the judge prompts (isolated / transition / bare),
+% lambda, and how the transition reward combines with the outcome reward.
+
+\section{Experimental Setup}
+% TODO: student (Qwen2.5-3B, 4-bit LoRA), judge, GRPO settings, tasks, seeds,
+% evaluation sets and sizes (GSM8K full test n=1319; StrategyQA n=200), compute.
+
+\section{Results}
+
+\subsection{Judge validity against hand labels}
+% Measured (14B judge, 40 hand-labelled traces over 20 problems, exploratory).
+% TODO: add the 7B judge once scored. Intervals resample problems, not traces.
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lcc}
+\toprule
+Scorer & Step AUC & 95\% CI \\
+\midrule
+bare       & 0.89 & [0.79, 0.97] \\
+isolated   & 0.82 & [0.69, 0.94] \\
+transition & 0.82 & [0.73, 0.90] \\
+\bottomrule
+\end{tabular}
+\caption{Step-level AUC of the 14B judge against first-break hand labels
+(19 breaks). TODO: 7B judge row.}
+\label{tab:judge}
+\end{table}
+
+\subsection{Training: ORM vs TAPR}
+% TODO: 3 seeds each, mean and std, full GSM8K (n=1319) plus StrategyQA transfer,
+% paired significance on per-problem outputs.
+
+\subsection{Reward degeneracy}
+% TODO: within-group zero-variance rates for outcome vs TAPR reward,
+% and whether the added variance tracks quality (variance-informativeness check).
+
+\section{Analysis}
+% TODO: policy drift (KL, LoRA norm, response length), and what changed in behaviour.
+
+\section*{Limitations}
+% REQUIRED by ACL/ARR. Be specific and honest. Candidates already known:
+% 3B student only; two tasks; 40 hand labels, LLM-drafted and human-reviewed;
+% 19 break steps; most breaks are plain arithmetic errors, so the population TAPR
+% targets is small on GSM8K; judge accuracy measured on a small calibration set.
+
+\section*{Ethics and Responsible NLP}
+% TODO: complete the Responsible NLP checklist on submission.
+% Disclose AI writing assistance as the ACL policy requires.
+
+\bibliography{references}
+\bibliographystyle{acl_natbib}
+
+\appendix
+\section{Hand-labelling protocol}
+\label{sec:appendix}
+% Rules are in notes/HANDLABEL_RULES.md. Summarize: first-break definition,
+% four rules, break types, who labelled what (L01-L10 agreed, L11-L40 drafted and reviewed).
+
+\end{document}
